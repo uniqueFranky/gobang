@@ -107,7 +107,7 @@ class Info extends React.Component {
         let history = new Array(len);
         for(let i = 0; i < len; i++) {
             const his = this.props.history[i];
-            history[i] = <div key={i} className={'step'}><p>{his[0] + '在（' + his[1] + ', ' + his[2] + '）落字'}</p></div>
+            history[i] = <div key={i} className={'step'}><p>{his[0] + '在（' + his[1] + ', ' + his[2] + '）落子'}</p></div>
         }
 
         return (
@@ -300,7 +300,9 @@ class Game extends React.Component {
                 }
                 this.setState({
                     status: stat,
-                    nextPlayer: 'Player'
+                    nextPlayer: 'Player',
+                    history: new Array(15 * 15),
+                    historyLen: 0
                 });
             }, 500);
 
