@@ -118,8 +118,7 @@ class Game extends React.Component {
                     status: newStatus,
                     nextPlayer: 'Computer'
                 });
-
-                aiSolve(this.state.status, this.aiCallback);
+                setTimeout(() => aiSolve(this.state.status, this.aiCallback), 1000);
             } else {
                 alert("该格已被下过棋子");
             }
@@ -209,6 +208,7 @@ class Game extends React.Component {
             }
         }
 
+
         for(let sum = 4; sum < 15; sum++) {
             for(let i = 4; i <= sum; i++) {
                 let playerNum = 0, computerNum = 0;
@@ -225,13 +225,14 @@ class Game extends React.Component {
                     return 'Player';
                 }
             }
-
-            for(let j = 4; j <= sum; j++) {
+        }
+        for(let sum = 15; sum < 25; sum++) {
+            for(let j = sum - 14; j < 11; j++) {
                 let playerNum = 0, computerNum = 0;
                 for(let k = 0; k < 5; k++) {
-                    if(this.state.status[sum - j + k][j - k] === 'Computer') {
+                    if(this.state.status[sum - j - k][j + k] === 'Computer') {
                         computerNum++;
-                    } else if(this.state.status[sum - j + k][j - k] === 'Player') {
+                    } else if(this.state.status[sum - j - k][j + k] === 'Player') {
                         playerNum++;
                     }
                 }
@@ -242,6 +243,8 @@ class Game extends React.Component {
                 }
             }
         }
+
+
         return 'None';
     }
 
@@ -258,7 +261,7 @@ class Game extends React.Component {
                     status: stat,
                     nextPlayer: 'Player'
                 });
-            }, 1000);
+            }, 500);
 
         }
         return <Board didClick={this.didClick} status={this.state.status}/>;

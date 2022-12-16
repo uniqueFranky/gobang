@@ -1,6 +1,21 @@
 
 
 export function aiSolve(status, callback) {
+
+    for(let i = 0; i < 15; i++) {
+        for(let j = 0; j < 15; j++) {
+            if(status[i][j] === 'None') {
+                status[i][j] = 'Computer';
+                let score = calc(status, 'Computer');
+                status[i][j] = 'None';
+                if(score >= 10 ** 10) {
+                    callback(i, j);
+                    return;
+                }
+            }
+        }
+    }
+
     let ij = alpha_beta(status, 1, 3, -(10**11), 10**11);
     callback(ij[0], ij[1]);
 }
@@ -77,7 +92,7 @@ function calc(status, turn) {
                 }
             }
             if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 10 : selfNum);
+                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
             }
         }
     }
@@ -93,7 +108,7 @@ function calc(status, turn) {
                 }
             }
             if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 10 : selfNum);
+                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
             }
         }
     }
@@ -109,7 +124,7 @@ function calc(status, turn) {
                 }
             }
             if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 10 : selfNum);
+                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
             }
         }
         if(dec > 0) {
@@ -123,7 +138,7 @@ function calc(status, turn) {
                     }
                 }
                 if(oppNum === 0) {
-                    totScore += 10 ** (selfNum === 5 ? 10 : selfNum);
+                    totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
                 }
             }
         }
@@ -140,24 +155,24 @@ function calc(status, turn) {
                 }
             }
             if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 10 : selfNum);
+                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
             }
         }
-
-        for(let j = 4; j <= sum; j++) {
+    }
+    for(let sum = 15; sum < 25; sum++) {
+        for(let j = sum - 14; j < 11; j++) {
             let selfNum = 0, oppNum = 0;
             for(let k = 0; k < 5; k++) {
-                if(status[sum - j + k][j - k] === turn) {
+                if(status[sum - j - k][j + k] === turn) {
                     selfNum++;
-                } else if(status[sum - j + k][j - k] === turn) {
+                } else if(status[sum - j - k][j + k] === opp) {
                     oppNum++;
                 }
             }
             if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 10 : selfNum);
+                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
             }
         }
-
     }
 
     return totScore;
