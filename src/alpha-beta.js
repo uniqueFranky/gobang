@@ -8,7 +8,7 @@ export function aiSolve(status, callback) {
                 status[i][j] = 'Computer';
                 let score = calc(status, 'Computer');
                 status[i][j] = 'None';
-                if(score >= 10 ** 10) {
+                if(score >= 8 ** 10) {
                     callback(i, j);
                     return;
                 }

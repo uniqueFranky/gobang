@@ -91,6 +91,37 @@ class Board extends React.Component {
     }
 }
 
+class Info extends React.Component {
+
+    render() {
+        const infoStyle = {
+            position: 'absolute',
+            left: '780px',
+            top: '0'
+        }
+        const historyStyle = {
+            overflow: 'auto',
+            height: '500px'
+        }
+        const len = this.props.historyLen;
+        let history = new Array(len);
+        for(let i = 0; i < len; i++) {
+            const his = this.props.history[i];
+            history[i] = <div key={i} className={'step'}><p>{his[0] + '在（' + his[1] + ', ' + his[2] + '）落字'}</p></div>
+        }
+
+        return (
+            <div className={'info'} style={infoStyle}>
+                <h1>现在是{this.props.nextPlayer}的回合</h1>
+                <div className={'histories'} style={historyStyle}>
+                    {history}
+                </div>
+            </div>
+        )
+    }
+}
+
+
 class Game extends React.Component {
 
 
@@ -103,6 +134,8 @@ class Game extends React.Component {
         this.state = {
             status: stat,
             nextPlayer: 'Player',
+            history: new Array(15 * 15),
+            historyLen: 0
         };
         this.didClick = this.didClick.bind(this);
         this.aiCallback = this.aiCallback.bind(this);
@@ -114,9 +147,13 @@ class Game extends React.Component {
             if(this.state.status[i][j] === 'None') {
                 let newStatus = this.state.status.slice();
                 newStatus[i][j] = 'Player';
+                let newHistory = this.state.history.slice();
+                newHistory[this.state.historyLen] = ['Player', i, j];
                 this.setState({
                     status: newStatus,
-                    nextPlayer: 'Computer'
+                    nextPlayer: 'Computer',
+                    history: newHistory,
+                    historyLen: this.state.historyLen + 1
                 });
                 setTimeout(() => aiSolve(this.state.status, this.aiCallback), 1000);
             } else {
@@ -130,9 +167,13 @@ class Game extends React.Component {
     aiCallback(i, j) {
         let newStatus = this.state.status.slice();
         newStatus[i][j] = 'Computer';
+        let newHistory = this.state.history.slice();
+        newHistory[this.state.historyLen] = ['Computer', i, j];
         this.setState({
             status: newStatus,
-            nextPlayer: 'Player'
+            nextPlayer: 'Player',
+            history: newHistory,
+            historyLen: this.state.historyLen + 1
         });
     }
 
@@ -264,7 +305,12 @@ class Game extends React.Component {
             }, 500);
 
         }
-        return <Board didClick={this.didClick} status={this.state.status}/>;
+        return (
+            <div className={'game'}>
+                <Board didClick={this.didClick} status={this.state.status} />
+                <Info nextPlayer={this.state.nextPlayer} history={this.state.history} historyLen={this.state.historyLen} />
+            </div>
+        );
     }
 }
 
