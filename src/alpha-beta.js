@@ -1,29 +1,29 @@
 
+const continuousFive = 1000000;
+const doubleFour = 10000;
+const doubleThree = 1000;
+const doubleTwo = 100;
+const doubleOne = 10;
+const singleFour = 1000;
+const singleThree = 100;
+const singleTwo = 10;
+
+const constantDoubleScores = [
+    0, doubleOne, doubleTwo, doubleThree, doubleFour, continuousFive
+];
+const constantSingleScores = [
+    0, 0, singleTwo, singleThree, singleFour, continuousFive
+];
 
 export function aiSolve(status, callback) {
 
-    for(let i = 0; i < 15; i++) {
-        for(let j = 0; j < 15; j++) {
-            if(status[i][j] === 'None') {
-                status[i][j] = 'Computer';
-                let score = calc(status, 'Computer');
-                status[i][j] = 'None';
-                if(score >= 8 ** 10) {
-                    callback(i, j);
-                    return;
-                }
-            }
-        }
-    }
-
-    let ij = alpha_beta(status, 1, 3, -(10**11), 10**11);
+    let ij = alpha_beta(status, 1, 3, -(10**9), 10**9);
     callback(ij[0], ij[1]);
 }
 
 function alpha_beta(status, curDep, maxDep, alpha, beta) {
-    // console.log("dep=" + curDep + " alpha=" + alpha + " beta=" + beta);
     if(curDep === maxDep) {
-        // console.log("score=" + calcScore(status));
+
         return calcScore(status);
     }
     let maxposi, maxposj;
@@ -33,7 +33,9 @@ function alpha_beta(status, curDep, maxDep, alpha, beta) {
                 if(status[i][j] === 'None') {
                     status[i][j] = 'Player';
                     let val = alpha_beta(status, curDep + 1, maxDep, -(10**11), alpha);
-                    alpha = alpha < val ? alpha : val;
+                    if(val < alpha) {
+                        alpha = val;
+                    }
                     status[i][j] = 'None';
                     if(alpha <= beta) {
                         // console.log("cut min alpha=" + alpha + " beta=" + beta);
@@ -72,110 +74,178 @@ function alpha_beta(status, curDep, maxDep, alpha, beta) {
 
 }
 
+function havePiecesVertically(status, turn, x, y, len) {
+    for(let i = 0; i < len; i++) {
+        if(i + x >= 15 || status[i + x][y] !== turn) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function havePiecesHorizontally(status, turn, x, y, len) {
+    for(let j = 0; j < len; j++) {
+        if(j + y >= 15 || status[x][j + y] !== turn) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function havePiecesOnMainDiagonal(status, turn, x, y, len) {
+    for(let k = 0; k < len; k++) {
+        let xx = x + k;
+        let yy = y + k;
+        if(xx >= 15 || yy >= 15 || status[xx][yy] !== turn) {
+            return false;
+        }
+    }
+    return true;
+}
+function havePiecesOnSubDiagonal(status, turn, x, y, len) {
+    for(let k = 0; k < len; k++) {
+        let xx = x + k;
+        let yy = y - k;
+        if(xx >= 15 || yy < 0 || status[xx][yy] !== turn) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function isDoubleVertically(status, x, y, len) {
+    let x1 = x - 1;
+    let x2 = x + len;
+    if(x1 < 0 || x2 >= 15) {
+        return false;
+    }
+    return status[x1][y] === 'None' && status[x2][y] === 'None';
+}
+
+function isSingleVertically(status, x, y, len) {
+    let x1 = x - 1;
+    let x2 = x + len;
+    if(x1 >= 0 && status[x1][y] === 'None') {
+        return true;
+    }
+    return x2 < 15 && status[x2][y] === 'None';
+
+}
+
+function isDoubleHorizontally(status, x, y, len) {
+    let y1 = y - 1;
+    let y2 = y + len;
+    if(y1 < 0 || y2 >= 15) {
+        return false;
+    }
+    return status[x][y1] === 'None' && status[x][y2] === 'None';
+}
+
+function isSingleHorizontally(status, x, y, len) {
+    let y1 = y - 1;
+    let y2 = y + len;
+    if(y1 >= 0 && status[x][y1] === 'None') {
+        return true;
+    }
+    return y2 < 15 && status[x][y2] === 'None';
+
+}
+
+function isDoubleOnMainDiagonal(status, x, y, len) {
+    let x1 = x - 1;
+    let y1 = y + 1;
+    let x2 = x + len;
+    let y2 = y - len;
+    if(x1 < 0 || y1 >= 15 || x2 >= 15 || y2 < 0) {
+        return false;
+    }
+    return status[x1][y1] === 'None' && status[x2][y2] === 'None';
+}
+
+function isSingleOnSubDiagonal(status, x, y, len) {
+    let x1 = x - 1;
+    let y1 = y + 1;
+    let x2 = x + len;
+    let y2 = y - len;
+    if(x1 >= 0 && y1 < 15 && status[x1][y1] === 'None') {
+        return true;
+    }
+    return x2 < 15 && y2 >= 0 && status[x2][y2] === 'None';
+
+}
+
+function isDoubleOnSubDiagonal(status, x, y, len) {
+    let x1 = x - 1;
+    let y1 = y - 1;
+    let x2 = x + len;
+    let y2 = y + len;
+    if(x1 < 0 || y1 < 0 || x2 >= 15 || y2 >= 15) {
+        return false;
+    }
+    return status[x1][y1] === 'None' && status[x2][y2] === 'None';
+}
+
+function isSingleOnMainDiagonal(status, x, y, len) {
+    let x1 = x - 1;
+    let y1 = y - 1;
+    let x2 = x + len;
+    let y2 = y + len;
+    if(x1 >= 0 && y1 >= 0 && status[x1][y1] === 'None') {
+        return true;
+    }
+    return x2 < 15 && y2 < 15 && status[x2][y2] === 'None';
+
+}
+
 function calc(status, turn) {
-    let totScore = 0;
-    let opp;
-    if(turn === 'Player') {
-        opp = 'Computer';
-    } else {
-        opp = 'Player';
-    }
-
+    let score = 0;
     for(let i = 0; i < 15; i++) {
-        for(let j = 0; j < 11; j++) {
-            let selfNum = 0, oppNum = 0;
-            for(let k = j; k < j + 5; k++) {
-                if(status[i][k] === turn) {
-                    selfNum++;
-                } else if(status[i][k] === opp) {
-                    oppNum++;
-                }
-            }
-            if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
-            }
-        }
-    }
+        for(let j = 0; j < 15; j++) {
+            for(let len = 5; len >= 1; len--) {
+                let thisScore = 0;
 
-    for(let j = 0; j < 15; j++) {
-        for(let i = 0; i < 11; i++) {
-            let selfNum = 0, oppNum = 0;
-            for(let k = i; k < i + 5; k++) {
-                if(status[k][j] === turn) {
-                    selfNum++;
-                } else if(status[k][j] === opp) {
-                    oppNum++;
-                }
-            }
-            if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
-            }
-        }
-    }
-
-    for(let dec = 10; dec > -1; dec--) {
-        for(let i = dec; i < 11; i++) {
-            let selfNum = 0, oppNum = 0;
-            for(let k = 0; k < 5; k++) {
-                if(status[i + k][i - dec + k] === turn) {
-                    selfNum++;
-                } else if(status[i + k][i - dec + k] === opp) {
-                    oppNum++;
-                }
-            }
-            if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
-            }
-        }
-        if(dec > 0) {
-            for(let j = dec; j < 11; j++) {
-                let selfNum = 0, oppNum = 0;
-                for(let k = 0; k < 5; k++) {
-                    if(status[j - dec + k][j + k] === turn) {
-                        selfNum++;
-                    } else if(status[j - dec + k][j + k]=== opp) {
-                        oppNum++;
+                if(havePiecesVertically(status, turn, i, j, len)) {
+                    if(isDoubleVertically(status, i, j, len)) {
+                        thisScore += constantDoubleScores[len];
+                    } else if(isSingleVertically(status, i, j, len)) {
+                        thisScore += constantSingleScores[len];
                     }
                 }
-                if(oppNum === 0) {
-                    totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
+
+                if(havePiecesHorizontally(status, turn, i, j, len)) {
+                    if(isDoubleHorizontally(status, i, j, len)) {
+                        thisScore += constantDoubleScores[len];
+                    } else if(isSingleHorizontally(status, i, j, len)) {
+                        thisScore += constantSingleScores[len];
+                    }
+                }
+
+                if(havePiecesOnMainDiagonal(status, turn, i, j, len)) {
+                    if(isDoubleOnMainDiagonal(status, i, j, len)) {
+                        thisScore += constantDoubleScores[len];
+                    } else if(isSingleOnMainDiagonal(status, i, j, len)) {
+                        thisScore += constantSingleScores[len];
+                    }
+                }
+
+                if(havePiecesOnSubDiagonal(status, turn, i, j, len)) {
+                    if(isDoubleOnSubDiagonal(status, i, j, len)) {
+                        thisScore += constantDoubleScores[len];
+                    } else if(isSingleOnSubDiagonal(status, i, j, len)) {
+                        thisScore += constantSingleScores[len];
+                    }
+                }
+
+                if(thisScore > 0) {
+                    score += thisScore;
+                    break;
                 }
             }
+
         }
     }
 
-    for(let sum = 4; sum < 15; sum++) {
-        for(let i = 4; i <= sum; i++) {
-            let selfNum = 0, oppNum = 0;
-            for(let k = 0; k < 5; k++) {
-                if(status[i - k][sum - i + k] === turn) {
-                    selfNum++;
-                } else if(status[i - k][sum - i + k] === opp) {
-                    oppNum++;
-                }
-            }
-            if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
-            }
-        }
-    }
-    for(let sum = 15; sum < 25; sum++) {
-        for(let j = sum - 14; j < 11; j++) {
-            let selfNum = 0, oppNum = 0;
-            for(let k = 0; k < 5; k++) {
-                if(status[sum - j - k][j + k] === turn) {
-                    selfNum++;
-                } else if(status[sum - j - k][j + k] === opp) {
-                    oppNum++;
-                }
-            }
-            if(oppNum === 0) {
-                totScore += 10 ** (selfNum === 5 ? 8 : selfNum);
-            }
-        }
-    }
-
-    return totScore;
+    return score;
 }
 
 
