@@ -14,6 +14,9 @@ const constantDoubleScores = [
 const constantSingleScores = [
     0, 0, singleTwo, singleThree, singleFour, continuousFive
 ];
+const constantDiscreteScores = [
+    0, 10, 100, 1000, 10000, 1000000
+];
 
 export function aiSolve(status, callback) {
 
@@ -255,8 +258,82 @@ function isDoubleOnSubDiagonal(status, turn, x, y, len) {
     return status[x1][y1] === 'None' && status[x2][y2] === 'None';
 }
 
+function numberOfPiecesHorizontally(status, turn, x, y) {
+    if(x + 4 >= 15) {
+        return 0;
+    }
+    let num = 0;
+    for(let i = 0; i < 5; i++) {
+        if(status[x + i][y] !== turn && status[x + i][y] !== 'None') {
+            return 0;
+        } else if(status[x + i][y] === turn) {
+            num++;
+        }
+    }
+    return num;
+}
 
-function calc(status, turn) {
+function numberOfPiecesVertically(status, turn, x, y) {
+    if(y + 4 >= 15) {
+        return 0;
+    }
+    let num = 0;
+    for(let j = 0; j < 5; j++) {
+        if(status[x][y + j] !== turn && status[x][y + j] !== 'None') {
+            return 0;
+        } else if(status[x][y + j] === turn) {
+            num++;
+        }
+    }
+    return num;
+}
+
+function numberOfPiecesOnMainDiagonal(status, turn, x, y) {
+    if(x + 4 >= 15 || y + 4 >= 15) {
+        return 0;
+    }
+    let num = 0;
+    for(let k = 0; k < 5; k++) {
+        if(status[x + k][y + k] !== turn && status[x + k][y + k] !== 'None') {
+            return 0;
+        } else if(status[x + k][y + k] === turn) {
+            num++;
+        }
+    }
+    return num;
+}
+
+function numberOfPiecesOnSubDiagonal(status, turn, x, y) {
+    if(x - 4 < 0 || y + 4 >= 15) {
+        return 0;
+    }
+    let num = 0;
+    for(let k = 0; k < 5; k++) {
+        if(status[x - k][y + k] !== turn && status[x - k][y + k] !== 'None') {
+            return 0;
+        } else if(status[x - k][y + k] === turn) {
+            num++;
+        }
+    }
+    return num;
+}
+
+function calc(status, turn) { // Winning Line Evaluation
+    let score = 0;
+    for(let i = 0; i < 15; i++) {
+        for(let j = 0; j < 15; j++) {
+            if(status[i][j] === turn) {
+                score += constantDiscreteScores[numberOfPiecesHorizontally(status, turn, i, j)];
+                score += constantDiscreteScores[numberOfPiecesVertically(status, turn, i, j)];
+                score += constantDiscreteScores[numberOfPiecesOnMainDiagonal(status, turn, i, j)];
+                score += constantDiscreteScores[numberOfPiecesOnSubDiagonal(status, turn, i, j)];
+            }
+        }
+    }
+    return score;
+}
+
+function calcVersion2(status, turn) { // Continuous Pieces Evaluation
     let score = 0;
     for(let i = 0; i < 15; i++) {
         for(let j = 0; j < 15; j++) {
