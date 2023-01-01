@@ -33,9 +33,9 @@ class Cell extends React.Component {
         } else {
             pieceStyle["top"] = (37.5 + i * 48 - 19).toString() + 'px';
         }
-        if(this.props.selector === 'None') {
+        if(this.props.selector === 0) {
             return <area onClick={() => this.onclick()} shape={'circle'} coords={(37.5 + j * 49) + ',' + (37.5 + i * 48) + ',12'} alt={'map'}/>;
-        } else if(this.props.selector === 'Player') {
+        } else if(this.props.selector === 2) {
             return <img className={'piece'} src={blackImg} alt={'black'} style={pieceStyle}/>;
         } else {
             return <img className={'piece'} src={whiteImg} alt={'white'} style={pieceStyle}/>;
@@ -65,7 +65,7 @@ class Board extends React.Component {
         let pieces = new Array(15 * 15);
         for(let i = 0; i < 15; i++) {
             for(let j = 0; j < 15; j++) {
-                if(this.props.status[i][j] === 'None') {
+                if(this.props.status[i][j] === 0) {
                     areas[i * 15 + j] = <Cell key={(i * 15 + j).toString()} rowId={i} colId={j} selector={this.props.status[i][j]} didClick={this.didClick} />;
                 } else {
                    pieces[i * 15 + j] = <Cell key={(i * 15 + j).toString()} rowId={i} colId={j} selector={this.props.status[i][j]} didClick={this.didClick} />;
@@ -109,7 +109,7 @@ class Info extends React.Component {
             const his = this.props.history[i];
             history[i] = <div key={i} className={'step'}><p>{his[0] + '在（' + his[1] + ', ' + his[2] + '）落子'}</p></div>
         }
-        if(this.props.nextPlayer === 'Player') {
+        if(this.props.nextPlayer === 2) {
             return (
                 <div className={'info'} style={infoStyle}>
                     <h1>现在是{this.props.nextPlayer}的回合</h1>
@@ -142,11 +142,11 @@ class Game extends React.Component {
         super(props);
         let stat = new Array(15);
         for(let i = 0; i < 15; i++) {
-            stat[i] = new Array(15).fill('None');
+            stat[i] = new Array(15).fill(0);
         }
         this.state = {
             status: stat,
-            nextPlayer: 'Player',
+            nextPlayer: 2,
             history: new Array(15 * 15),
             historyLen: 0,
             aiTime: 'NA'
@@ -157,19 +157,19 @@ class Game extends React.Component {
 
     didClick(i, j) {
         console.log(i, j);
-        if(this.state.nextPlayer === 'Player') {
-            if(this.state.status[i][j] === 'None') {
+        if(this.state.nextPlayer === 2) {
+            if(this.state.status[i][j] === 0) {
                 let newStatus = this.state.status.slice();
-                newStatus[i][j] = 'Player';
+                newStatus[i][j] = 2;
                 let newHistory = this.state.history.slice();
-                newHistory[this.state.historyLen] = ['Player', i, j];
+                newHistory[this.state.historyLen] = [2, i, j];
                 this.setState({
                     status: newStatus,
-                    nextPlayer: 'Computer',
+                    nextPlayer: 1,
                     history: newHistory,
                     historyLen: this.state.historyLen + 1
                 });
-                setTimeout(() => aiSolve(this.state.status, this.aiCallback), 10);
+                setTimeout(() => aiSolve(this.state.status, this.aiCallback), 1000);
             } else {
                 alert("该格已被下过棋子");
             }
@@ -180,12 +180,12 @@ class Game extends React.Component {
 
     aiCallback(i, j, tim) {
         let newStatus = this.state.status.slice();
-        newStatus[i][j] = 'Computer';
+        newStatus[i][j] = 1;
         let newHistory = this.state.history.slice();
-        newHistory[this.state.historyLen] = ['Computer', i, j];
+        newHistory[this.state.historyLen] = [1, i, j];
         this.setState({
             status: newStatus,
-            nextPlayer: 'Player',
+            nextPlayer: 2,
             history: newHistory,
             historyLen: this.state.historyLen + 1,
             aiTime: tim
@@ -197,16 +197,16 @@ class Game extends React.Component {
             for(let j = 0; j < 11; j++) {
                 let playerNum = 0, computerNum = 0;
                 for(let k = j; k < j + 5; k++) {
-                    if(this.state.status[i][k] === 'Computer') {
+                    if(this.state.status[i][k] === 1) {
                         computerNum++;
-                    } else if(this.state.status[i][k] === 'Player') {
+                    } else if(this.state.status[i][k] === 2) {
                         playerNum++;
                     }
                 }
                 if(computerNum === 5) {
-                    return 'Computer';
+                    return 1;
                 } else if(playerNum === 5) {
-                    return 'Player';
+                    return 2;
                 }
             }
         }
@@ -215,16 +215,16 @@ class Game extends React.Component {
             for(let i = 0; i < 11; i++) {
                 let playerNum = 0, computerNum = 0;
                 for(let k = i; k < i + 5; k++) {
-                    if(this.state.status[k][j] === 'Computer') {
+                    if(this.state.status[k][j] === 1) {
                         computerNum++;
-                    } else if(this.state.status[k][j] === 'Player') {
+                    } else if(this.state.status[k][j] === 2) {
                         playerNum++;
                     }
                 }
                 if(computerNum === 5) {
-                    return 'Computer';
+                    return 1;
                 } else if(playerNum === 5) {
-                    return 'Player';
+                    return 2;
                 }
             }
         }
@@ -233,32 +233,32 @@ class Game extends React.Component {
             for(let i = dec; i < 11; i++) {
                 let playerNum = 0, computerNum = 0;
                 for(let k = 0; k < 5; k++) {
-                    if(this.state.status[i + k][i - dec + k] === 'Computer') {
+                    if(this.state.status[i + k][i - dec + k] === 1) {
                         computerNum++;
-                    } else if(this.state.status[i + k][i - dec + k] === 'Player') {
+                    } else if(this.state.status[i + k][i - dec + k] === 2) {
                         playerNum++;
                     }
                 }
                 if(computerNum === 5) {
-                    return 'Computer';
+                    return 1;
                 } else if(playerNum === 5) {
-                    return 'Player';
+                    return 2;
                 }
             }
             if(dec > 0) {
                 for(let j = dec; j < 11; j++) {
                     let playerNum = 0, computerNum = 0;
                     for(let k = 0; k < 5; k++) {
-                        if(this.state.status[j - dec + k][j + k] === 'Computer') {
+                        if(this.state.status[j - dec + k][j + k] === 1) {
                             computerNum++;
-                        } else if(this.state.status[j - dec + k][j + k]=== 'Player') {
+                        } else if(this.state.status[j - dec + k][j + k]=== 2) {
                             playerNum++;
                         }
                     }
                     if(computerNum === 5) {
-                        return 'Computer';
+                        return 1;
                     } else if(playerNum === 5) {
-                        return 'Player';
+                        return 2;
                     }
                 }
             }
@@ -269,16 +269,16 @@ class Game extends React.Component {
             for(let i = 4; i <= sum; i++) {
                 let playerNum = 0, computerNum = 0;
                 for(let k = 0; k < 5; k++) {
-                    if(this.state.status[i - k][sum - i + k] === 'Computer') {
+                    if(this.state.status[i - k][sum - i + k] === 1) {
                         computerNum++;
-                    } else if(this.state.status[i - k][sum - i + k] === 'Player') {
+                    } else if(this.state.status[i - k][sum - i + k] === 2) {
                         playerNum++;
                     }
                 }
                 if(computerNum === 5) {
-                    return 'Computer';
+                    return 1;
                 } else if(playerNum === 5) {
-                    return 'Player';
+                    return 2;
                 }
             }
         }
@@ -286,36 +286,37 @@ class Game extends React.Component {
             for(let j = sum - 14; j < 11; j++) {
                 let playerNum = 0, computerNum = 0;
                 for(let k = 0; k < 5; k++) {
-                    if(this.state.status[sum - j - k][j + k] === 'Computer') {
+                    if(this.state.status[sum - j - k][j + k] === 1) {
                         computerNum++;
-                    } else if(this.state.status[sum - j - k][j + k] === 'Player') {
+                    } else if(this.state.status[sum - j - k][j + k] === 2) {
                         playerNum++;
                     }
                 }
                 if(computerNum === 5) {
-                    return 'Computer';
+                    return 1;
                 } else if(playerNum === 5) {
-                    return 'Player';
+                    return 2;
                 }
             }
         }
 
 
-        return 'None';
+        return 0;
     }
 
     render() {
+        console.log(JSON.stringify(this.state.status))
         let winner = this.checkWinner();
-        if(winner !== 'None') {
+        if(winner !== 0) {
             setTimeout(() => {
                 alert(winner + " wins!");
                 let stat = new Array(15);
                 for(let i = 0; i < 15; i++) {
-                    stat[i] = new Array(15).fill('None');
+                    stat[i] = new Array(15).fill(0);
                 }
                 this.setState({
                     status: stat,
-                    nextPlayer: 'Player',
+                    nextPlayer: 2,
                     history: new Array(15 * 15),
                     historyLen: 0
                 });

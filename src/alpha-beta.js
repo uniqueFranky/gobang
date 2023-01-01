@@ -15,7 +15,7 @@ const constantSingleScores = [
     0, 0, singleTwo, singleThree, singleFour, continuousFive
 ];
 const constantDiscreteScores = [
-    0, 10, 100, 1000, 10000, 1000000
+    0, 10, 100, 1000, 10000, 100000
 ];
 
 export function aiSolve(status, callback) {
@@ -25,10 +25,10 @@ export function aiSolve(status, callback) {
 
     for(let i = 0; i < 15; i++) {
         for(let j = 0; j < 15; j++) {
-            if(status[i][j] === 'None') {
+            if(status[i][j] === 0) {
                 status[i][j] = 'Computer';
-                let ok = hasWon(status);
-                status[i][j] = 'None';
+                let ok = hasWon(status, 'Computer');
+                status[i][j] = 0;
                 if(ok) {
                     let end = performance.now();
                     callback(i, j, end - start);
@@ -38,7 +38,7 @@ export function aiSolve(status, callback) {
         }
     }
 
-    ij = alpha_beta(status, 1, 4, -(10**9), 10**9);
+    ij = alpha_beta(status, 1, 5, -(10**20), 10**20);
     let end = performance.now();
     callback(ij[0], ij[1], end - start);
 }
@@ -56,18 +56,18 @@ function alpha_beta(status, curDep, maxDep, alpha, beta) {
     }
     for(let i = 0; i < 15; i++) {
         for(let j = 0; j < 15; j++) {
-            if(status[i][j] !== 'None') {
+            if(status[i][j] !== 0) {
                 for(let k = -3; k <= 3; k++) {
-                    if(i + k >= 0 && i + k < 15 && status[i + k][j] === 'None') {
+                    if(i + k >= 0 && i + k < 15 && status[i + k][j] === 0) {
                         selectable[i + k][j] = true;
                     }
-                    if(j + k >= 0 && j + k < 15 && status[i][j + k] === 'None') {
+                    if(j + k >= 0 && j + k < 15 && status[i][j + k] === 0) {
                         selectable[i][j + k] = true;
                     }
-                    if(i + k >= 0 && i + k < 15 && j + k >= 0 && j + k < 15 && status[i + k][j + k] === 'None') {
+                    if(i + k >= 0 && i + k < 15 && j + k >= 0 && j + k < 15 && status[i + k][j + k] === 0) {
                         selectable[i + k][j + k] = true;
                     }
-                    if(i - k >= 0 && i - k < 15 && j + k >= 0 && j + k < 15 && status[i - k][j + k] === 'None') {
+                    if(i - k >= 0 && i - k < 15 && j + k >= 0 && j + k < 15 && status[i - k][j + k] === 0) {
                         selectable[i - k][j + k] = true;
                     }
                 }
@@ -89,12 +89,12 @@ function alpha_beta(status, curDep, maxDep, alpha, beta) {
         for(let id = 0; id < moveLen; id++) {
             let i = moveX[id];
             let j = moveY[id];
-            status[i][j] = 'Player';
-            let val = alpha_beta(status, curDep + 1, maxDep, -(10**9), alpha);
+            status[i][j] = 2;
+            let val = alpha_beta(status, curDep + 1, maxDep, -(10**20), alpha);
             if(val < alpha) {
                 alpha = val;
             }
-            status[i][j] = 'None';
+            status[i][j] = 0;
             if(alpha <= beta) {
                 // console.log("cut min alpha=" + alpha + " beta=" + beta);
                 return alpha;
@@ -106,13 +106,13 @@ function alpha_beta(status, curDep, maxDep, alpha, beta) {
             let i = moveX[id];
             let j = moveY[id];
             status[i][j] = 'Computer';
-            let val = alpha_beta(status, curDep + 1, maxDep, 10 ** 9, alpha);
+            let val = alpha_beta(status, curDep + 1, maxDep, 10 ** 20, alpha);
             if (val > alpha) {
                 alpha = val;
                 maxposi = i;
                 maxposj = j;
             }
-            status[i][j] = 'None';
+            status[i][j] = 0;
             if (alpha >= beta) {
                 // console.log("cut max alpha=" + alpha + " beta=" + beta);
                 return alpha;
@@ -176,7 +176,7 @@ function isDoubleVertically(status, turn, x, y, len) {
     if(x1 < 0 || x2 >= 15) {
         return false;
     }
-    return status[x1][y] === 'None' && status[x2][y] === 'None';
+    return status[x1][y] === 0 && status[x2][y] === 0;
 }
 
 function isSingleVertically(status, turn, x, y, len) {
@@ -185,10 +185,10 @@ function isSingleVertically(status, turn, x, y, len) {
     }
     let x1 = x - 1;
     let x2 = x + len;
-    if(x1 >= 0 && status[x1][y] === 'None') {
+    if(x1 >= 0 && status[x1][y] === 0) {
         return true;
     }
-    return x2 < 15 && status[x2][y] === 'None';
+    return x2 < 15 && status[x2][y] === 0;
 
 }
 
@@ -201,7 +201,7 @@ function isDoubleHorizontally(status, turn, x, y, len) {
     if(y1 < 0 || y2 >= 15) {
         return false;
     }
-    return status[x][y1] === 'None' && status[x][y2] === 'None';
+    return status[x][y1] === 0 && status[x][y2] === 0;
 }
 
 function isSingleHorizontally(status, turn, x, y, len) {
@@ -210,10 +210,10 @@ function isSingleHorizontally(status, turn, x, y, len) {
     }
     let y1 = y - 1;
     let y2 = y + len;
-    if(y1 >= 0 && status[x][y1] === 'None') {
+    if(y1 >= 0 && status[x][y1] === 0) {
         return true;
     }
-    return y2 < 15 && status[x][y2] === 'None';
+    return y2 < 15 && status[x][y2] === 0;
 
 }
 
@@ -228,7 +228,7 @@ function isDoubleOnMainDiagonal(status, turn, x, y, len) {
     if(x1 < 0 || y1 >= 15 || x2 >= 15 || y2 < 0) {
         return false;
     }
-    return status[x1][y1] === 'None' && status[x2][y2] === 'None';
+    return status[x1][y1] === 0 && status[x2][y2] === 0;
 }
 
 function isSingleOnMainDiagonal(status, turn, x, y, len) {
@@ -239,10 +239,10 @@ function isSingleOnMainDiagonal(status, turn, x, y, len) {
     let y1 = y - 1;
     let x2 = x + len;
     let y2 = y + len;
-    if(x1 >= 0 && y1 >= 0 && status[x1][y1] === 'None') {
+    if(x1 >= 0 && y1 >= 0 && status[x1][y1] === 0) {
         return true;
     }
-    return x2 < 15 && y2 < 15 && status[x2][y2] === 'None';
+    return x2 < 15 && y2 < 15 && status[x2][y2] === 0;
 
 }
 
@@ -254,10 +254,10 @@ function isSingleOnSubDiagonal(status, turn, x, y, len) {
     let y1 = y + 1;
     let x2 = x + len;
     let y2 = y - len;
-    if(x1 >= 0 && y1 < 15 && status[x1][y1] === 'None') {
+    if(x1 >= 0 && y1 < 15 && status[x1][y1] === 0) {
         return true;
     }
-    return x2 < 15 && y2 >= 0 && status[x2][y2] === 'None';
+    return x2 < 15 && y2 >= 0 && status[x2][y2] === 0;
 
 }
 
@@ -272,16 +272,16 @@ function isDoubleOnSubDiagonal(status, turn, x, y, len) {
     if(x1 < 0 || y1 < 0 || x2 >= 15 || y2 >= 15) {
         return false;
     }
-    return status[x1][y1] === 'None' && status[x2][y2] === 'None';
+    return status[x1][y1] === 0 && status[x2][y2] === 0;
 }
 
-function numberOfPiecesHorizontally(status, turn, x, y) {
+function numberOfPiecesVertically(status, turn, x, y) {
     if(x + 4 >= 15) {
         return 0;
     }
     let num = 0;
     for(let i = 0; i < 5; i++) {
-        if(status[x + i][y] !== turn && status[x + i][y] !== 'None') {
+        if(status[x + i][y] !== turn && status[x + i][y] !== 0) {
             return 0;
         } else if(status[x + i][y] === turn) {
             num++;
@@ -290,13 +290,13 @@ function numberOfPiecesHorizontally(status, turn, x, y) {
     return num;
 }
 
-function numberOfPiecesVertically(status, turn, x, y) {
+function numberOfPiecesHorizontally(status, turn, x, y) {
     if(y + 4 >= 15) {
         return 0;
     }
     let num = 0;
     for(let j = 0; j < 5; j++) {
-        if(status[x][y + j] !== turn && status[x][y + j] !== 'None') {
+        if(status[x][y + j] !== turn && status[x][y + j] !== 0) {
             return 0;
         } else if(status[x][y + j] === turn) {
             num++;
@@ -311,7 +311,7 @@ function numberOfPiecesOnMainDiagonal(status, turn, x, y) {
     }
     let num = 0;
     for(let k = 0; k < 5; k++) {
-        if(status[x + k][y + k] !== turn && status[x + k][y + k] !== 'None') {
+        if(status[x + k][y + k] !== turn && status[x + k][y + k] !== 0) {
             return 0;
         } else if(status[x + k][y + k] === turn) {
             num++;
@@ -326,7 +326,7 @@ function numberOfPiecesOnSubDiagonal(status, turn, x, y) {
     }
     let num = 0;
     for(let k = 0; k < 5; k++) {
-        if(status[x - k][y + k] !== turn && status[x - k][y + k] !== 'None') {
+        if(status[x - k][y + k] !== turn && status[x - k][y + k] !== 0) {
             return 0;
         } else if(status[x - k][y + k] === turn) {
             num++;
@@ -339,12 +339,10 @@ function calc(status, turn) { // Winning Line Evaluation
     let score = 0;
     for(let i = 0; i < 15; i++) {
         for(let j = 0; j < 15; j++) {
-            if(status[i][j] === turn) {
-                score += constantDiscreteScores[numberOfPiecesHorizontally(status, turn, i, j)];
-                score += constantDiscreteScores[numberOfPiecesVertically(status, turn, i, j)];
-                score += constantDiscreteScores[numberOfPiecesOnMainDiagonal(status, turn, i, j)];
-                score += constantDiscreteScores[numberOfPiecesOnSubDiagonal(status, turn, i, j)];
-            }
+            score += constantDiscreteScores[numberOfPiecesHorizontally(status, turn, i, j)];
+            score += constantDiscreteScores[numberOfPiecesVertically(status, turn, i, j)];
+            score += constantDiscreteScores[numberOfPiecesOnMainDiagonal(status, turn, i, j)];
+            score += constantDiscreteScores[numberOfPiecesOnSubDiagonal(status, turn, i, j)];
         }
     }
     return score;
@@ -356,7 +354,7 @@ function calcVersion2(status, turn) { // Continuous Pieces Evaluation
         for(let j = 0; j < 15; j++) {
             for(let len = 5; len >= 1; len--) {
 
-                if(status[i][j] === 'None') {
+                if(status[i][j] === 0) {
                     break;
                 }
 
@@ -399,18 +397,18 @@ function calcVersion2(status, turn) { // Continuous Pieces Evaluation
 
 
 function calcScore(status) {
-    return calc(status, 'Computer') - calc(status, 'Player');
+    return calc(status, 1) - calc(status, 2);
 }
 
-function hasWon(status) {
+function hasWon(status, turn) {
     for(let i = 0; i < 15; i++) {
         for(let j = 0; j < 15; j++) {
-            if(status[i][j] !== 'Computer') {
+            if(status[i][j] !== turn) {
                 continue;
             }
             let ok = true;
             for(let k = 1; k < 5; k++) {
-                if(i + k >= 15 || status[i + k][j] !== 'Computer') {
+                if(i + k >= 15 || status[i + k][j] !== turn) {
                     ok = false;
                     break;
                 }
@@ -421,7 +419,7 @@ function hasWon(status) {
 
             ok = true;
             for(let k = 1; k < 5; k++) {
-                if(j + k >= 15 || status[i][j + k] !== 'Computer') {
+                if(j + k >= 15 || status[i][j + k] !== turn) {
                     ok = false;
                     break;
                 }
@@ -432,7 +430,7 @@ function hasWon(status) {
 
             ok = true;
             for(let k = 1; k < 5; k++) {
-                if(i + k >= 15 || j + k >= 15 || status[i + k][j + k] !== 'Computer') {
+                if(i + k >= 15 || j + k >= 15 || status[i + k][j + k] !== turn) {
                     ok = false;
                     break;
                 }
@@ -443,7 +441,7 @@ function hasWon(status) {
 
             ok = true;
             for(let k = 1; k < 5; k++) {
-                if(i - k < 0 || j + k >= 15 || status[i - k][j + k] !== 'Computer') {
+                if(i - k < 0 || j + k >= 15 || status[i - k][j + k] !== turn) {
                     ok = false;
                     break;
                 }
