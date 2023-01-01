@@ -17,12 +17,13 @@ type Step struct {
 
 func main() {
 	server := Server{mux.NewRouter()}
-	server.HandleFunc("/getStep", getStep()).Methods("GET")
+	server.HandleFunc("/getStep", getStep()).Methods("POST")
 	http.ListenAndServe(":9999", server)
 }
 
 func getStep() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		var status [][]int
 		if err := json.NewDecoder(r.Body).Decode(&status); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import boardImg from './images/board.jpg';
 import blackImg from './images/black.png';
 import whiteImg from './images/white.png';
-import {aiSolve} from "./alpha-beta";
+import {aiSolve} from "./transport";
 
 
 class Cell extends React.Component {
