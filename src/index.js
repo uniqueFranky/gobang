@@ -109,15 +109,28 @@ class Info extends React.Component {
             const his = this.props.history[i];
             history[i] = <div key={i} className={'step'}><p>{his[0] + '在（' + his[1] + ', ' + his[2] + '）落子'}</p></div>
         }
-
-        return (
-            <div className={'info'} style={infoStyle}>
-                <h1>现在是{this.props.nextPlayer}的回合</h1>
-                <div className={'histories'} style={historyStyle}>
-                    {history}
+        if(this.props.nextPlayer === 'Player') {
+            return (
+                <div className={'info'} style={infoStyle}>
+                    <h1>现在是{this.props.nextPlayer}的回合</h1>
+                    <h3>AI上一步用时：{this.props.aiTime}ms</h3>
+                    <div className={'histories'} style={historyStyle}>
+                        {history}
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        } else {
+            return (
+                <div className={'info'} style={infoStyle}>
+                    <h1>现在是{this.props.nextPlayer}的回合</h1>
+                    <h3>AI正在思考中…</h3>
+                    <div className={'histories'} style={historyStyle}>
+                        {history}
+                    </div>
+                </div>
+            )
+        }
+
     }
 }
 
@@ -135,7 +148,8 @@ class Game extends React.Component {
             status: stat,
             nextPlayer: 'Player',
             history: new Array(15 * 15),
-            historyLen: 0
+            historyLen: 0,
+            aiTime: 'NA'
         };
         this.didClick = this.didClick.bind(this);
         this.aiCallback = this.aiCallback.bind(this);
@@ -173,9 +187,9 @@ class Game extends React.Component {
             status: newStatus,
             nextPlayer: 'Player',
             history: newHistory,
-            historyLen: this.state.historyLen + 1
+            historyLen: this.state.historyLen + 1,
+            aiTime: tim
         });
-        console.log(tim);
     }
 
     checkWinner() {
@@ -311,7 +325,8 @@ class Game extends React.Component {
         return (
             <div className={'game'}>
                 <Board didClick={this.didClick} status={this.state.status} />
-                <Info nextPlayer={this.state.nextPlayer} history={this.state.history} historyLen={this.state.historyLen} />
+                <Info nextPlayer={this.state.nextPlayer} history={this.state.history} historyLen={this.state.historyLen}
+                      aiTime={this.state.aiTime} />
             </div>
         );
     }

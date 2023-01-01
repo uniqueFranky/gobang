@@ -21,7 +21,23 @@ const constantDiscreteScores = [
 export function aiSolve(status, callback) {
 
     let start = performance.now();
-    let ij = alpha_beta(status, 1, 4, -(10**9), 10**9);
+    let ij;
+
+    for(let i = 0; i < 15; i++) {
+        for(let j = 0; j < 15; j++) {
+            if(status[i][j] === 'None') {
+                status[i][j] = 'Computer';
+                let ok = hasWon(status);
+                status[i][j] = 'None';
+                if(ok) {
+                    let end = performance.now();
+                    callback(i, j, end - start);
+                }
+            }
+        }
+    }
+
+    ij = alpha_beta(status, 1, 5, -(10**9), 10**9);
     let end = performance.now();
     callback(ij[0], ij[1], end - start);
 }
@@ -383,4 +399,55 @@ function calcVersion2(status, turn) { // Continuous Pieces Evaluation
 
 function calcScore(status) {
     return calc(status, 'Computer') - calc(status, 'Player');
+}
+
+function hasWon(status) {
+    for(let i = 0; i < 15; i++) {
+        for(let j = 0; j < 15; j++) {
+            if(status[i][j] !== 'Computer') {
+                continue;
+            }
+            let ok = true;
+            for(let k = 1; k < 5; k++) {
+                if(i + k >= 15 || status[i + k][j] !== 'Computer') {
+                    ok = false;
+                    break;
+                }
+            }
+            if(ok) {
+                return true;
+            }
+
+            ok = true;
+            for(let k = 1; k < 5; k++) {
+                if(j + k >= 15 || status[i][j + k] !== 'Computer') {
+                    ok = false;
+                    break;
+                }
+            }
+            if(ok) {
+                return true;
+            }
+
+            ok = true;
+            for(let k = 1; k < 5; k++) {
+                if(i + k >= 15 || j + k >= 15 || status[i + k][j + k] !== 'Computer') {
+                    ok = false;
+                    break;
+                }
+            }
+            if(ok) {
+                return true;
+            }
+
+            ok = true;
+            for(let k = 1; k < 5; k++) {
+                if(i - k < 0 || j + k >= 15 || status[i - k][j + k] !== 'Computer') {
+                    ok = false;
+                    break;
+                }
+            }
+            return ok;
+        }
+    }
 }
