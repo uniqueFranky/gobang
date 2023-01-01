@@ -155,7 +155,7 @@ class Game extends React.Component {
                     history: newHistory,
                     historyLen: this.state.historyLen + 1
                 });
-                setTimeout(() => aiSolve(this.state.status, this.aiCallback), 1000);
+                setTimeout(() => aiSolve(this.state.status, this.aiCallback), 10);
             } else {
                 alert("该格已被下过棋子");
             }
@@ -164,7 +164,7 @@ class Game extends React.Component {
         }
     }
 
-    aiCallback(i, j) {
+    aiCallback(i, j, tim) {
         let newStatus = this.state.status.slice();
         newStatus[i][j] = 'Computer';
         let newHistory = this.state.history.slice();
@@ -175,6 +175,7 @@ class Game extends React.Component {
             history: newHistory,
             historyLen: this.state.historyLen + 1
         });
+        console.log(tim);
     }
 
     checkWinner() {
