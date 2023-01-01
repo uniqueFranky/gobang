@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -18,7 +19,9 @@ type Step struct {
 func main() {
 	server := Server{mux.NewRouter()}
 	server.HandleFunc("/getStep", getStep()).Methods("POST")
-	http.ListenAndServe(":9999", server)
+	if err := http.ListenAndServeTLS(":9999", "/etc/httpd/ssl/franky.pro.crt", "/etc/httpd/ssl/franky.pro.key", server); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func getStep() http.HandlerFunc {

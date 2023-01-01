@@ -4,7 +4,7 @@ import boardImg from './images/board.jpg';
 import blackImg from './images/black.png';
 import whiteImg from './images/white.png';
 import {aiSolve} from "./transport";
-
+import {Dna} from  'react-loader-spinner'  // or another spinner
 
 class Cell extends React.Component {
 
@@ -113,7 +113,7 @@ class Info extends React.Component {
             return (
                 <div className={'info'} style={infoStyle}>
                     <h1>现在是{this.props.nextPlayer}的回合</h1>
-                    <h3>AI上一步用时：{this.props.aiTime}ms</h3>
+                    <h3>AI上一步用时：{this.props.aiTime / 1000}s</h3>
                     <div className={'histories'} style={historyStyle}>
                         {history}
                     </div>
@@ -124,6 +124,13 @@ class Info extends React.Component {
                 <div className={'info'} style={infoStyle}>
                     <h1>现在是{this.props.nextPlayer}的回合</h1>
                     <h3>AI正在思考中…</h3>
+                    {/*<Spinner animation="border" />*/}
+                    <Dna
+                        height="100"
+                        width="100"
+                        color='grey'
+                        ariaLabel='loading'
+                    />
                     <div className={'histories'} style={historyStyle}>
                         {history}
                     </div>
