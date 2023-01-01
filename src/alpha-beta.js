@@ -32,12 +32,13 @@ export function aiSolve(status, callback) {
                 if(ok) {
                     let end = performance.now();
                     callback(i, j, end - start);
+                    return;
                 }
             }
         }
     }
 
-    ij = alpha_beta(status, 1, 5, -(10**9), 10**9);
+    ij = alpha_beta(status, 1, 4, -(10**9), 10**9);
     let end = performance.now();
     callback(ij[0], ij[1], end - start);
 }
