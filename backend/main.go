@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"gorilla/mux"
-	"log"
 	"net/http"
 )
 
@@ -19,9 +18,10 @@ type Step struct {
 func main() {
 	server := Server{mux.NewRouter()}
 	server.HandleFunc("/getStep", getStep()).Methods("POST")
-	if err := http.ListenAndServeTLS(":9999", "/etc/httpd/ssl/franky.pro.crt", "/etc/httpd/ssl/franky.pro.key", server); err != nil {
-		log.Fatal(err)
-	}
+	//if err := http.ListenAndServeTLS(":9999", "/etc/httpd/ssl/franky.pro.crt", "/etc/httpd/ssl/franky.pro.key", server); err != nil {
+	//	log.Fatal(err)
+	//}
+	http.ListenAndServe(":9999", server)
 }
 
 func getStep() http.HandlerFunc {
@@ -127,7 +127,7 @@ func alpha_beta(status [][]int, curDep int, maxDep int, alpha int64, beta int64)
 	return alpha
 }
 
-var constantDiscreteScores = [6]int64{0, 10, 100, 1000, 10000, 100000}
+var constantDiscreteScores = [6]int64{0, 10, 100, 1000, 100000, 1000000}
 
 func numberOfPiecesHorizontally(status [][]int, turn int, x int, y int) int {
 	if y+4 >= 15 {
@@ -203,5 +203,5 @@ func calc(status [][]int, turn int) int64 {
 }
 
 func calcScore(status [][]int) int64 {
-	return calc(status, 1) - calc(status, 2)
+	return calc(status, 1) - calc(status, 2)*2
 }

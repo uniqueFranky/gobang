@@ -124,7 +124,6 @@ class Info extends React.Component {
                 <div className={'info'} style={infoStyle}>
                     <h1>现在是{this.props.nextPlayer}的回合</h1>
                     <h3>AI正在思考中…</h3>
-                    {/*<Spinner animation="border" />*/}
                     <Dna
                         height="100"
                         width="100"
