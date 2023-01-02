@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"gobang-backend/calculator"
 	"gobang-backend/evaluator"
 	"gorilla/mux"
-	"log"
 	"net/http"
 )
 
@@ -23,7 +23,7 @@ func main() {
 	evaluator.Init()
 	server.HandleFunc("/getStep", getStep()).Methods("POST")
 	if err := http.ListenAndServeTLS(":9999", "/etc/httpd/ssl/franky.pro.crt", "/etc/httpd/ssl/franky.pro.key", server); err != nil {
-		log.Fatal(err)
+		fmt.Println("ERROR!!!!!!!!")
 	}
 
 	//http.ListenAndServe(":9999", server)

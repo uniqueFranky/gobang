@@ -105,8 +105,13 @@ func (c *Calculator) shouldDefense(oppLvTuples []evaluator.LevelTuple, selfLvTup
 	sort.Slice(selfLvTuples, func(i, j int) bool {
 		return selfLvTuples[i].Lv < selfLvTuples[j].Lv
 	})
-	if len(selfLvTuples) > 0 && selfLvTuples[0].Lv <= 2 /* 2 == single4 */ {
-		return false
+	if len(selfLvTuples) > 0 {
+		if selfLvTuples[0].Lv <= 2 /* 2 == single4 */ {
+			return false
+		}
+		if len(oppLvTuples) > 0 && selfLvTuples[0].Lv <= oppLvTuples[0].Lv {
+			return false
+		}
 	}
 	return danger > 0
 }
