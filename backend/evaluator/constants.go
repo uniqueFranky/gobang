@@ -2,6 +2,7 @@ package evaluator
 
 type Direction int
 type Level int
+type Danger int
 
 const (
 	horizontal   Direction = 0
@@ -10,8 +11,13 @@ const (
 	subDiagonal  Direction = 3
 )
 
-var moveX = [4]int{0, 1, 1, -1}
-var moveY = [4]int{1, 0, 1, 1}
+const (
+	safe      Danger = 0
+	dangerous Danger = 1
+)
+
+var MoveX = [4]int{0, 1, 1, -1}
+var MoveY = [4]int{1, 0, 1, 1}
 
 const (
 	win     Level = 0
@@ -25,6 +31,7 @@ const (
 	half2   Level = 8
 	double1 Level = 9
 	none    Level = 10
+	warning Level = double3
 )
 
 var level [3][3][3][3][3][3]Level

@@ -1,6 +1,6 @@
 export function aiSolve(status, callback) {
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://franky.pro:9999/getStep", true);
+    xhr.open("POST", "http://localhost:9999/getStep", true);
     const start = performance.now();
     xhr.onload = function (e) {
         if(xhr.readyState === 4) {
