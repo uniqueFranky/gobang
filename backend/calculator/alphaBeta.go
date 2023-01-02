@@ -1,5 +1,9 @@
 package calculator
 
+import (
+	"gobang-backend/evaluator"
+)
+
 func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) int64 {
 	if curDep == maxDep {
 		return c.calcScore()
@@ -14,11 +18,13 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) 
 
 	pts, winner := c.getSelectable(turn)
 	if winner == 1 {
-		return 100000000
+		return win + 10000
 	} else if winner == 2 {
-		return -100000000
+		return -win - 10000
 	}
-
+	//if curDep == 1 {
+	//	fmt.Println(pts)
+	//}
 	moveLen := len(pts)
 	var maxposi int
 	var maxposj int
@@ -27,7 +33,7 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) 
 			i := pts[id].X
 			j := pts[id].Y
 			c.status[i][j] = 2
-			val := c.AlphaBeta(curDep+1, maxDep, -1000000000, alpha)
+			val := c.AlphaBeta(curDep+1, maxDep, -win*10, alpha)
 			if val < alpha {
 				alpha = val
 			}
@@ -41,9 +47,11 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) 
 		for id := 0; id < moveLen; id++ {
 			i := pts[id].X
 			j := pts[id].Y
-			//fmt.Println(i, j)
 			c.status[i][j] = 1
-			val := c.AlphaBeta(curDep+1, maxDep, 1000000000, alpha)
+			val := c.AlphaBeta(curDep+1, maxDep, win*10, alpha)
+			//if curDep == 1 {
+			//	fmt.Println(i, j, val, alpha)
+			//}
 			if val > alpha {
 				alpha = val
 				maxposi = i
@@ -60,8 +68,6 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) 
 	}
 	return alpha
 }
-
-var constantDiscreteScores = [6]int64{0, 10, 100, 1000, 100000, 1000000}
 
 func (c *Calculator) numberOfPiecesHorizontally(turn int, x int, y int) int {
 	if y+4 >= 15 {
@@ -125,13 +131,11 @@ func (c *Calculator) numberOfPiecesOnSubDiagonal(turn int, x int, y int) int {
 
 func (c *Calculator) calc(turn int) int64 {
 	var score int64 = 0
-	for i := 0; i < 15; i++ {
-		for j := 0; j < 15; j++ {
-			score += constantDiscreteScores[c.numberOfPiecesHorizontally(turn, i, j)]
-			score += constantDiscreteScores[c.numberOfPiecesVertically(turn, i, j)]
-			score += constantDiscreteScores[c.numberOfPiecesOnMainDiagonal(turn, i, j)]
-			score += constantDiscreteScores[c.numberOfPiecesOnSubDiagonal(turn, i, j)]
-		}
+	eva := evaluator.NewEvaluator(c.status)
+	lvTuple := eva.GetLevelsForCalculator(turn)
+	for _, tp := range lvTuple {
+		lv := tp.Lv
+		score += constantScores[lv]
 	}
 	return score
 }

@@ -59,17 +59,40 @@ func (e *Evaluator) GetAllLevels(turn int, selectable []Point) ([]LevelTuple, Da
 				Lv:  lv,
 				Dir: dir,
 			}
-			lvTuple = append(lvTuple, tp)
-			if lv <= warning {
-				//e.Print()
-				//fmt.Println(lv)
-				danger = dangerous
-				return []LevelTuple{tp}, danger
+			if lv <= warning { //WARNING
+				if danger == safe {
+					lvTuple = make([]LevelTuple, 0)
+					danger = dangerous
+				}
+				lvTuple = append(lvTuple, tp)
+			} else {
+				if danger == safe {
+					lvTuple = append(lvTuple, tp)
+				}
 			}
 
 		}
 	}
 	return lvTuple, danger
+}
+
+func (e *Evaluator) GetLevelsForCalculator(turn int) []LevelTuple {
+	var lvTuple []LevelTuple
+	for i := 0; i < 15; i++ {
+		for j := 0; j < 15; j++ {
+			for dir := horizontal; dir <= subDiagonal; dir++ {
+				lv := e.getLevel(i, j, turn, dir)
+				tp := LevelTuple{
+					X:   i,
+					Y:   j,
+					Lv:  lv,
+					Dir: dir,
+				}
+				lvTuple = append(lvTuple, tp)
+			}
+		}
+	}
+	return lvTuple
 }
 
 func (e *Evaluator) Print() {

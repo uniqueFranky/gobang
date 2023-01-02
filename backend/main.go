@@ -25,6 +25,7 @@ func main() {
 	//	log.Fatal(err)
 	//}
 	http.ListenAndServe(":9999", server)
+
 }
 
 func getStep() http.HandlerFunc {
@@ -36,7 +37,7 @@ func getStep() http.HandlerFunc {
 			return
 		}
 		calc := calculator.NewCalculator(status)
-		step := calc.AlphaBeta(1, 5, -1000000000, 1000000000)
+		step := calc.AlphaBeta(1, 5, -10000000, 10000000)
 		y := step % 15
 		x := (step - y) / 15
 		s := Step{

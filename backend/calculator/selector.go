@@ -1,6 +1,9 @@
 package calculator
 
-import "gobang-backend/evaluator"
+import (
+	"gobang-backend/evaluator"
+	"sort"
+)
 
 func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 	selectable := make([][]bool, 15)
@@ -11,7 +14,7 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 	for i := 0; i < 15; i++ {
 		for j := 0; j < 15; j++ {
 			if c.status[i][j] != 0 {
-				for k := -3; k <= 3; k++ {
+				for k := -2; k <= 2; k++ {
 					if i+k < 15 && i+k >= 0 && c.status[i+k][j] == 0 {
 						selectable[i+k][j] = true
 					}
@@ -48,7 +51,8 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 	}
 
 	lvTuples, danger := c.getAllLevels(opp, pts)
-	if danger > 0 {
+
+	if c.shouldDefense(lvTuples, danger) {
 		var newPts []evaluator.Point
 		for _, tp := range lvTuples {
 			if tp.Lv == 0 {
@@ -69,9 +73,24 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 		}
 		return newPts, 0
 	} else {
+		lvTuples, _ = c.getAllLevels(turn, pts)
+		sort.Slice(lvTuples, func(i, j int) bool {
+			return lvTuples[i].Lv < lvTuples[j].Lv
+		})
+		pts = make([]evaluator.Point, 0)
+		for _, lvTp := range lvTuples {
+			pts = append(pts, evaluator.Point{
+				X: lvTp.X,
+				Y: lvTp.Y,
+			})
+		}
 		return pts, 0
 	}
 
+}
+
+func (c *Calculator) shouldDefense(lvTuples []evaluator.LevelTuple, danger evaluator.Danger) bool {
+	return danger > 0
 }
 
 func (c *Calculator) getAllLevels(turn int, selectable []evaluator.Point) ([]evaluator.LevelTuple, evaluator.Danger) {
