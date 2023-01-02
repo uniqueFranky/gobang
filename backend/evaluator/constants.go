@@ -31,7 +31,7 @@ const (
 	half2   Level = 8
 	double1 Level = 9
 	none    Level = 10
-	warning Level = double3
+	warning Level = single3
 )
 
 var level [3][3][3][3][3][3]Level
