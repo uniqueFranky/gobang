@@ -38,13 +38,11 @@ func (e *Evaluator) getLevel(x int, y int, turn int, dir Direction) Level {
 		}
 	}
 	lv := level[s[0]][s[1]][s[2]][s[3]][s[4]][s[5]]
-	//if lv <= warning {
-	//	fmt.Println("!!!!!!!!!!!", s[0], s[1], s[2], s[3], s[4], s[5], level[0][0][0][0][0][0], lv, none)
-	//}
 	return lv
 }
 
 func (e *Evaluator) GetAllLevels(turn int, selectable []Point) ([]LevelTuple, Danger) {
+	//fmt.Println("getAllLevelsOf", turn)
 	var lvTuple []LevelTuple
 	var danger Danger = 0
 	moveLen := len(selectable)
@@ -73,6 +71,7 @@ func (e *Evaluator) GetAllLevels(turn int, selectable []Point) ([]LevelTuple, Da
 
 		}
 	}
+	//fmt.Println(danger)
 	return lvTuple, danger
 }
 

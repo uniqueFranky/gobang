@@ -28,6 +28,7 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 						selectable[i-k][j+k] = true
 					}
 				}
+				selectable[i][j] = true
 			}
 		}
 	}
@@ -49,9 +50,9 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 	} else {
 		opp = 1
 	}
-
+	//fmt.Println(pts)
 	lvTuples, danger := c.getAllLevels(opp, pts)
-
+	added := make(map[int]bool)
 	if c.shouldDefense(lvTuples, danger) {
 		var newPts []evaluator.Point
 		for _, tp := range lvTuples {
@@ -63,7 +64,8 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 			for i := 0; i < 6; i++ {
 				xx := x + evaluator.MoveX[tp.Dir]*i
 				yy := y + evaluator.MoveY[tp.Dir]*i
-				if xx >= 0 && xx < 15 && yy >= 0 && yy < 15 && c.status[xx][yy] == 0 {
+				if xx >= 0 && xx < 15 && yy >= 0 && yy < 15 && c.status[xx][yy] == 0 && !added[xx*15+yy] {
+					added[xx*15+yy] = true
 					newPts = append(newPts, evaluator.Point{
 						X: xx,
 						Y: yy,
@@ -78,11 +80,21 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 			return lvTuples[i].Lv < lvTuples[j].Lv
 		})
 		pts = make([]evaluator.Point, 0)
-		for _, lvTp := range lvTuples {
-			pts = append(pts, evaluator.Point{
-				X: lvTp.X,
-				Y: lvTp.Y,
-			})
+		for _, tp := range lvTuples {
+			x := tp.X
+			y := tp.Y
+			for i := 0; i < 6; i++ {
+				xx := x + evaluator.MoveX[tp.Dir]*i
+				yy := y + evaluator.MoveY[tp.Dir]*i
+				if xx >= 0 && xx < 15 && yy >= 0 && yy < 15 && c.status[xx][yy] == 0 && !added[xx*15+yy] {
+					added[xx*15+yy] = true
+					pts = append(pts, evaluator.Point{
+						X: xx,
+						Y: yy,
+					})
+				}
+			}
+
 		}
 		return pts, 0
 	}
