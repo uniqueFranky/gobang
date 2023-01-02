@@ -51,11 +51,12 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 		opp = 1
 	}
 	//fmt.Println(pts)
-	lvTuples, danger := c.getAllLevels(opp, pts)
+	oppLvTuples, danger := c.getAllLevels(opp, pts)
+	selfLvTuples, _ := c.getAllLevels(turn, pts)
 	added := make(map[int]bool)
-	if c.shouldDefense(lvTuples, danger) {
+	if c.shouldDefense(oppLvTuples, selfLvTuples, danger) {
 		var newPts []evaluator.Point
-		for _, tp := range lvTuples {
+		for _, tp := range oppLvTuples {
 			if tp.Lv == 0 {
 				return nil, opp
 			}
@@ -75,12 +76,8 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 		}
 		return newPts, 0
 	} else {
-		lvTuples, _ = c.getAllLevels(turn, pts)
-		sort.Slice(lvTuples, func(i, j int) bool {
-			return lvTuples[i].Lv < lvTuples[j].Lv
-		})
 		pts = make([]evaluator.Point, 0)
-		for _, tp := range lvTuples {
+		for _, tp := range selfLvTuples {
 			x := tp.X
 			y := tp.Y
 			for i := 0; i < 6; i++ {
@@ -101,7 +98,16 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 
 }
 
-func (c *Calculator) shouldDefense(lvTuples []evaluator.LevelTuple, danger evaluator.Danger) bool {
+func (c *Calculator) shouldDefense(oppLvTuples []evaluator.LevelTuple, selfLvTuples []evaluator.LevelTuple, danger evaluator.Danger) bool {
+	sort.Slice(oppLvTuples, func(i, j int) bool {
+		return oppLvTuples[i].Lv < oppLvTuples[j].Lv
+	})
+	sort.Slice(selfLvTuples, func(i, j int) bool {
+		return selfLvTuples[i].Lv < selfLvTuples[j].Lv
+	})
+	if len(selfLvTuples) > 0 && selfLvTuples[0].Lv <= 2 /* 2 == single4 */ {
+		return false
+	}
 	return danger > 0
 }
 

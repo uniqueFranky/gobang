@@ -5,6 +5,7 @@ import (
 	"gobang-backend/calculator"
 	"gobang-backend/evaluator"
 	"gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -21,11 +22,11 @@ func main() {
 	server := Server{mux.NewRouter()}
 	evaluator.Init()
 	server.HandleFunc("/getStep", getStep()).Methods("POST")
-	//if err := http.ListenAndServeTLS(":9999", "/etc/httpd/ssl/franky.pro.crt", "/etc/httpd/ssl/franky.pro.key", server); err != nil {
-	//	log.Fatal(err)
-	//}
+	if err := http.ListenAndServeTLS(":9999", "/etc/httpd/ssl/franky.pro.crt", "/etc/httpd/ssl/franky.pro.key", server); err != nil {
+		log.Fatal(err)
+	}
 
-	http.ListenAndServe(":9999", server)
+	//http.ListenAndServe(":9999", server)
 
 }
 
