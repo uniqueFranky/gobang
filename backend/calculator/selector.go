@@ -54,7 +54,8 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 	oppLvTuples, danger := c.getAllLevels(opp, pts)
 	selfLvTuples, _ := c.getAllLevels(turn, pts)
 	added := make(map[int]bool)
-	if c.shouldDefense(oppLvTuples, selfLvTuples, danger) {
+	if c.shouldDefense(oppLvTuples, selfLvTuples, danger) { // Defense
+		//fmt.Println("Defense")
 		var newPts []evaluator.Point
 		for _, tp := range oppLvTuples {
 			if tp.Lv == 0 {
@@ -75,7 +76,8 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 			}
 		}
 		return newPts, 0
-	} else {
+	} else { //Offense
+		//fmt.Println("Offense")
 		pts = make([]evaluator.Point, 0)
 		for _, tp := range selfLvTuples {
 			x := tp.X
