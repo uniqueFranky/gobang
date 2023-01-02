@@ -69,66 +69,6 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) 
 	return alpha
 }
 
-func (c *Calculator) numberOfPiecesHorizontally(turn int, x int, y int) int {
-	if y+4 >= 15 {
-		return 0
-	}
-	num := 0
-	for j := 0; j < 5; j++ {
-		if c.status[x][y+j] != turn && c.status[x][y+j] != 0 {
-			return 0
-		} else if c.status[x][y+j] == turn {
-			num++
-		}
-	}
-	return num
-}
-
-func (c *Calculator) numberOfPiecesVertically(turn int, x int, y int) int {
-	if x+4 >= 15 {
-		return 0
-	}
-	num := 0
-	for i := 0; i < 5; i++ {
-		if c.status[x+i][y] != turn && c.status[x+i][y] != 0 {
-			return 0
-		} else if c.status[x+i][y] == turn {
-			num++
-		}
-	}
-	return num
-}
-
-func (c *Calculator) numberOfPiecesOnMainDiagonal(turn int, x int, y int) int {
-	if x+4 >= 15 || y+4 >= 15 {
-		return 0
-	}
-	num := 0
-	for k := 0; k < 5; k++ {
-		if c.status[x+k][y+k] != turn && c.status[x+k][y+k] != 0 {
-			return 0
-		} else if c.status[x+k][y+k] == turn {
-			num++
-		}
-	}
-	return num
-}
-
-func (c *Calculator) numberOfPiecesOnSubDiagonal(turn int, x int, y int) int {
-	if x-4 < 0 || y+4 >= 15 {
-		return 0
-	}
-	num := 0
-	for k := 0; k < 5; k++ {
-		if c.status[x-k][y+k] != turn && c.status[x-k][y+k] != 0 {
-			return 0
-		} else if c.status[x-k][y+k] == turn {
-			num++
-		}
-	}
-	return num
-}
-
 func (c *Calculator) calc(turn int) int64 {
 	var score int64 = 0
 	eva := evaluator.NewEvaluator(c.status)
