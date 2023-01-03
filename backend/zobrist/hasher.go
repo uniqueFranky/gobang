@@ -10,8 +10,8 @@ type Hasher struct {
 }
 
 func InitHasher() {
-	mp = make([]map[uint64]int64, 12)
-	for i := 0; i <= 5; i++ {
+	mp = make([]map[uint64]int64, 20)
+	for i := 0; i <= 15; i++ {
 		mp[i] = make(map[uint64]int64)
 	}
 }

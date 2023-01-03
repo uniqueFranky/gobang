@@ -2,7 +2,7 @@ package calculator
 
 const (
 	win     int64 = 1000000
-	double4 int64 = 500000
+	double4 int64 = 200000
 	single4 int64 = 100000
 	double3 int64 = 50000
 	single3 int64 = 10000
