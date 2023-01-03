@@ -1,6 +1,7 @@
-export function aiSolve(status, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:9999/getStep", true);
+export function aiSolve(status, callback, zobrist) {
+    let xhr = new XMLHttpRequest();
+    let url = new URL("http://localhost:9999/getStep/" + zobrist)
+    xhr.open("POST", url, true);
     const start = performance.now();
     xhr.onload = function (e) {
         if(xhr.readyState === 4) {

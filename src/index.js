@@ -5,6 +5,7 @@ import blackImg from './images/black.png';
 import whiteImg from './images/white.png';
 import {aiSolve} from "./transport";
 import {Dna} from  'react-loader-spinner'  // or another spinner
+import {calculateHash} from "./hash";
 
 class Cell extends React.Component {
 
@@ -176,7 +177,7 @@ class Game extends React.Component {
                     history: newHistory,
                     historyLen: this.state.historyLen + 1
                 });
-                setTimeout(() => aiSolve(this.state.status, this.aiCallback), 1000);
+                setTimeout(() => aiSolve(this.state.status, this.aiCallback, calculateHash(this.state.status)), 1000);
             } else {
                 alert("该格已被下过棋子");
             }

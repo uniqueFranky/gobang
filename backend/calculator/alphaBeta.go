@@ -2,13 +2,19 @@ package calculator
 
 import (
 	"gobang-backend/evaluator"
+	"gobang-backend/zobrist"
 )
 
-func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) int64 {
+func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, hasher *zobrist.Hasher) int64 {
 	if curDep == maxDep {
 		return c.calcScore()
 	}
 
+	oldVal, ok := hasher.GetScore(maxDep - curDep)
+	if ok && curDep != 1 {
+		//fmt.Println(hasher.GetHashValue(), oldVal)
+		return oldVal
+	}
 	var turn int
 	if curDep%2 == 0 {
 		turn = 2
@@ -33,12 +39,15 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) 
 			i := pts[id].X
 			j := pts[id].Y
 			c.status[i][j] = 2
-			val := c.AlphaBeta(curDep+1, maxDep, -win*10, alpha)
+			hasher.PutAt(i, j, 0, 2)
+			val := c.AlphaBeta(curDep+1, maxDep, -win*10, alpha, hasher)
 			if val < alpha {
 				alpha = val
 			}
+			hasher.PutAt(i, j, 2, 0)
 			c.status[i][j] = 0
 			if alpha <= beta {
+				hasher.SetScore(maxDep-curDep, alpha)
 				return alpha
 			}
 		}
@@ -48,7 +57,8 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) 
 			i := pts[id].X
 			j := pts[id].Y
 			c.status[i][j] = 1
-			val := c.AlphaBeta(curDep+1, maxDep, win*10, alpha)
+			hasher.PutAt(i, j, 0, 1)
+			val := c.AlphaBeta(curDep+1, maxDep, win*10, alpha, hasher)
 			//if curDep == 1 {
 			//	fmt.Println(i, j, val, alpha)
 			//}
@@ -57,16 +67,20 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64) 
 				maxposi = i
 				maxposj = j
 			}
+			hasher.PutAt(i, j, 1, 0)
 			c.status[i][j] = 0
 			if alpha >= beta {
+				hasher.SetScore(maxDep-curDep, alpha)
 				return alpha
 			}
 		}
 	}
+	hasher.SetScore(maxDep-curDep, alpha)
 	if curDep == 1 {
 		return int64(maxposi*15 + maxposj)
+	} else {
+		return alpha
 	}
-	return alpha
 }
 
 func (c *Calculator) calc(turn int) int64 {
