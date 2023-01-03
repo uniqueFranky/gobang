@@ -93,11 +93,9 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 					})
 				}
 			}
-
 		}
 		return pts, 0
 	}
-
 }
 
 func (c *Calculator) shouldDefense(oppLvTuples []evaluator.LevelTuple, selfLvTuples []evaluator.LevelTuple, danger evaluator.Danger) bool {

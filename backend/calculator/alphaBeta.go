@@ -5,7 +5,7 @@ import (
 	"gobang-backend/zobrist"
 )
 
-func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, hasher *zobrist.Hasher, totScore *int64) int64 {
+func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, hasher *zobrist.Hasher, totScore *int64, stepCnt int) int64 {
 
 	var turn int
 	if curDep%2 == 0 {
@@ -44,7 +44,7 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 			j := pts[id].Y
 			c.status[i][j] = 2
 			hasher.PutAt(i, j, 0, 2)
-			val := c.AlphaBeta(curDep+1, maxDep, -win*10, alpha, hasher, totScore)
+			val := c.AlphaBeta(curDep+1, maxDep, -win*10, alpha, hasher, totScore, stepCnt+1)
 			if val < alpha {
 				alpha = val
 			}
@@ -62,7 +62,7 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 			j := pts[id].Y
 			c.status[i][j] = 1
 			hasher.PutAt(i, j, 0, 1)
-			val := c.AlphaBeta(curDep+1, maxDep, win*10, alpha, hasher, totScore)
+			val := c.AlphaBeta(curDep+1, maxDep, win*10, alpha, hasher, totScore, stepCnt+1)
 			//if curDep == 1 {
 			//	fmt.Println(i, j, val, alpha)
 			//}

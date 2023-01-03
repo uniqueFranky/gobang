@@ -4,8 +4,11 @@ import boardImg from './images/board.jpg';
 import blackImg from './images/black.png';
 import whiteImg from './images/white.png';
 import {aiSolve} from "./transport";
-import {Dna} from  'react-loader-spinner'  // or another spinner
+import {Dna} from  'react-loader-spinner'
+import {ColorRing} from  'react-loader-spinner'
 import {calculateHash} from "./hash";
+import {Button} from "react-bootstrap";
+import './index.css'
 
 class Cell extends React.Component {
 
@@ -26,7 +29,7 @@ class Cell extends React.Component {
         } else if(j >= 11) {
             pieceStyle["left"] = (37 + j * 49 - 9).toString() + 'px';
         } else {
-            pieceStyle["left"] = (37 + j * 49 - 12  ).toString() + 'px';
+            pieceStyle["left"] = (37 + j * 49 - 12).toString() + 'px';
         }
 
         if(i <= 7) {
@@ -34,12 +37,39 @@ class Cell extends React.Component {
         } else {
             pieceStyle["top"] = (37.5 + i * 48 - 19).toString() + 'px';
         }
+
+        let bgStyle = {
+            position: 'absolute',
+            width: '52.5px',
+            height: '52.5px',
+            top: (parseFloat(pieceStyle.top) - 1.25).toString() + 'px',
+            left: (parseFloat(pieceStyle.left) - 1.25).toString() + 'px',
+            display: 'none',
+            backgroundColor: '#FF0000',
+            borderRadius: '50%'
+        }
+        if(this.props.isLast) {
+            console.log(i, ' ', j, ' is last')
+            bgStyle.display = 'inline'
+        } else {
+            bgStyle.display = 'none'
+        }
         if(this.props.selector === 0) {
             return <area onClick={() => this.onclick()} shape={'circle'} coords={(37.5 + j * 49) + ',' + (37.5 + i * 48) + ',12'} alt={'map'}/>;
-        } else if(this.props.selector === 2) {
-            return <img className={'piece'} src={blackImg} alt={'black'} style={pieceStyle}/>;
+        } else if(this.props.selector === this.props.firstPlayer) {
+            return (
+              <span className={'piece'}>
+                  <div className={'pieceBg'} style={bgStyle} />
+                  <img className={'pieceImg'} src={blackImg} alt={'black'} style={pieceStyle} />
+              </span>
+            );
         } else {
-            return <img className={'piece'} src={whiteImg} alt={'white'} style={pieceStyle}/>;
+            return (
+                <span className={'piece'}>
+                    <div className={'pieceBg'} style={bgStyle} />
+                    <img className={'pieceImg'} src={whiteImg} alt={'white'} style={pieceStyle} />
+              </span>
+            );
         }
     }
     onclick() {
@@ -69,7 +99,11 @@ class Board extends React.Component {
                 if(this.props.status[i][j] === 0) {
                     areas[i * 15 + j] = <Cell key={(i * 15 + j).toString()} rowId={i} colId={j} selector={this.props.status[i][j]} didClick={this.didClick} />;
                 } else {
-                   pieces[i * 15 + j] = <Cell key={(i * 15 + j).toString()} rowId={i} colId={j} selector={this.props.status[i][j]} didClick={this.didClick} />;
+                    if(this.props.lastPos[0] === i && this.props.lastPos[1] === j) {
+                        pieces[i * 15 + j] = <Cell key={(i * 15 + j).toString()} rowId={i} colId={j} selector={this.props.status[i][j]} didClick={this.didClick} isLast={true} firstPlayer={this.props.firstPlayer} />;
+                    } else {
+                        pieces[i * 15 + j] = <Cell key={(i * 15 + j).toString()} rowId={i} colId={j} selector={this.props.status[i][j]} didClick={this.didClick} isLast={false} firstPlayer={this.props.firstPlayer}/>;
+                    }
                 }
             }
         }
@@ -100,40 +134,48 @@ class Info extends React.Component {
             left: '780px',
             top: '0'
         }
-        const historyStyle = {
-            overflow: 'auto',
-            height: '500px'
-        }
+
         const len = this.props.historyLen;
-        let history = new Array(len);
+        let history = String();
         for(let i = 0; i < len; i++) {
             const his = this.props.history[i];
-            history[i] = <div key={i} className={'step'}><p>{his[0] + '在（' + his[1] + ', ' + his[2] + '）落子'}</p></div>
+            const playerName = ['none', 'AI', "您"]
+            history += 'Step ' + (i + 1).toString() + ': ' + playerName[his[0]] + '在（' + his[1] + ', ' + his[2] + '）落子\n'
         }
         if(this.props.nextPlayer === 2) {
             return (
                 <div className={'info'} style={infoStyle}>
-                    <h1>现在是{this.props.nextPlayer}的回合</h1>
+                    <h1>现在是您的回合</h1>
                     <h3>AI上一步用时：{this.props.aiTime / 1000}s</h3>
-                    <div className={'histories'} style={historyStyle}>
-                        {history}
-                    </div>
+                    <Dna
+                        height="100"
+                        width="100"
+                        color='white'
+                        ariaLabel='loading'
+                    />
+                    <Button variant="contained" className={'button'} onClick={() => {
+                        alert(history);
+                    }}>
+                        <span>查看历史记录</span>
+                    </Button>
                 </div>
             )
         } else {
             return (
                 <div className={'info'} style={infoStyle}>
-                    <h1>现在是{this.props.nextPlayer}的回合</h1>
+                    <h1>现在是AI的回合</h1>
                     <h3>AI正在思考中…</h3>
-                    <Dna
+                    <ColorRing
                         height="100"
                         width="100"
                         color='grey'
                         ariaLabel='loading'
                     />
-                    <div className={'histories'} style={historyStyle}>
-                        {history}
-                    </div>
+                    <Button variant="contained" className={'button'} onClick={() => {
+                        alert(history);
+                    }}>
+                        <span>查看历史记录</span>
+                    </Button>
                 </div>
             )
         }
@@ -144,6 +186,31 @@ class Info extends React.Component {
 
 class Game extends React.Component {
 
+    restartGame(firstPlayer) {
+        let stat = new Array(15);
+        for(let i = 0; i < 15; i++) {
+            stat[i] = new Array(15).fill(0);
+        }
+        this.setState({
+            status: stat,
+            nextPlayer: 2,
+            history: new Array(15 * 15),
+            historyLen: 0,
+            aiTime: 'NA',
+            stepCnt: 0,
+            lastPos: [20, 20],
+            firstPlayer: firstPlayer
+        });
+        if(firstPlayer === 1) {
+            this.setState({
+                nextPlayer: 1,
+                lastPos: [7, 7]
+            });
+            setTimeout(() => {
+                this.aiCallback(7, 7, 0)
+            }, 500)
+        }
+    }
 
     constructor(props) {
         super(props);
@@ -152,15 +219,20 @@ class Game extends React.Component {
             stat[i] = new Array(15).fill(0);
         }
         this.state = {
-            status: [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
-            // status: stat,
-            nextPlayer: 2,
+            status: stat,
+            nextPlayer: 1,
             history: new Array(15 * 15),
             historyLen: 0,
-            aiTime: 'NA'
-        };
+            aiTime: 'NA',
+            stepCnt: 0,
+            lastPos: [7, 7],
+            firstPlayer: 0
+        }
+
+        this.restartGame = this.restartGame.bind(this);
         this.didClick = this.didClick.bind(this);
         this.aiCallback = this.aiCallback.bind(this);
+
     }
 
     didClick(i, j) {
@@ -175,9 +247,11 @@ class Game extends React.Component {
                     status: newStatus,
                     nextPlayer: 1,
                     history: newHistory,
-                    historyLen: this.state.historyLen + 1
+                    historyLen: this.state.historyLen + 1,
+                    stepCnt: this.state.stepCnt + 1,
+                    lastPos: [i, j]
                 });
-                setTimeout(() => aiSolve(this.state.status, this.aiCallback, calculateHash(this.state.status)), 1000);
+                setTimeout(() => aiSolve(this.state.status, this.aiCallback, calculateHash(this.state.status), this.state.stepCnt), 1000);
             } else {
                 alert("该格已被下过棋子");
             }
@@ -196,7 +270,9 @@ class Game extends React.Component {
             nextPlayer: 2,
             history: newHistory,
             historyLen: this.state.historyLen + 1,
-            aiTime: tim
+            aiTime: tim,
+            stepCnt: this.state.stepCnt + 1,
+            lastPos: [i, j]
         });
     }
 
@@ -313,27 +389,42 @@ class Game extends React.Component {
     }
 
     render() {
-        console.log(JSON.stringify(this.state.status))
-        let winner = this.checkWinner();
-        if(winner !== 0) {
-            setTimeout(() => {
-                alert(winner + " wins!");
-                this.setState({
-                    status: [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
-                    nextPlayer: 2,
-                    history: new Array(15 * 15),
-                    historyLen: 0
-                });
-            }, 500);
+        if(this.state.firstPlayer !== 0) { // who to be the first to play is decided
+            console.log(JSON.stringify(this.state.status))
+            let winner = this.checkWinner();
+            if(winner !== 0) {
+                setTimeout(() => {
+                    alert(winner + " wins!");
+                    this.setState({
+                        firstPlayer: 0
+                    })
+                }, 500);
 
+            }
+            return (
+                <div className={'game'}>
+                    <Board didClick={this.didClick} status={this.state.status} lastPos={this.state.lastPos} firstPlayer={this.state.firstPlayer}/>
+                    <Info nextPlayer={this.state.nextPlayer} history={this.state.history} historyLen={this.state.historyLen}
+                          aiTime={this.state.aiTime} />
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <Button variant="contained" className={'button'} onClick={() => {
+                        this.restartGame(2)
+                    }}>
+                        <span>您先手</span>
+                    </Button>
+                    <Button variant="contained" className={'button'} onClick={() => {
+                        this.restartGame(1)
+                    }}>
+                        <span>AI先手</span>
+                    </Button>
+                </div>
+            );
         }
-        return (
-            <div className={'game'}>
-                <Board didClick={this.didClick} status={this.state.status} />
-                <Info nextPlayer={this.state.nextPlayer} history={this.state.history} historyLen={this.state.historyLen}
-                      aiTime={this.state.aiTime} />
-            </div>
-        );
+
     }
 }
 
