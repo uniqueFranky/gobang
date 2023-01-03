@@ -109,8 +109,10 @@ func (c *Calculator) shouldDefense(oppLvTuples []evaluator.LevelTuple, selfLvTup
 		if selfLvTuples[0].Lv <= 2 /* 2 == single4 */ {
 			return false
 		}
-		if len(oppLvTuples) > 0 && selfLvTuples[0].Lv <= oppLvTuples[0].Lv {
-			return false
+		if len(oppLvTuples) > 0 {
+			if selfLvTuples[0].Lv <= oppLvTuples[0].Lv || (selfLvTuples[0].Lv <= 4 /* 4 == single3 */ && oppLvTuples[0].Lv > 2 /* 2 == single4 */) {
+				return false
+			}
 		}
 	}
 	return danger > 0
