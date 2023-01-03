@@ -410,7 +410,7 @@ class Game extends React.Component {
             );
         } else {
             return (
-                <div>
+                <div className={'selector'}>
                     <Button variant="contained" className={'button'} onClick={() => {
                         this.restartGame(2)
                     }}>
