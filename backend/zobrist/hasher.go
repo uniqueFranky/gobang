@@ -1,5 +1,8 @@
 package zobrist
 
+import "sync"
+
+var lock sync.Mutex
 var mp []map[uint64]int64
 
 type Hasher struct {
@@ -28,6 +31,8 @@ func (h *Hasher) GetHashValue() uint64 {
 }
 
 func (h *Hasher) GetScore(dep int) (int64, bool) {
+	lock.Lock()
+	defer lock.Unlock()
 	rec, ok := mp[dep][h.hashValue]
 	if ok {
 		return rec, true
@@ -36,7 +41,10 @@ func (h *Hasher) GetScore(dep int) (int64, bool) {
 }
 
 func (h *Hasher) SetScore(dep int, score int64) {
-	if score != 10000000 && score != -10000000 {
+	lock.Lock()
+	defer lock.Unlock()
+	_, ok := mp[dep][h.hashValue]
+	if !ok && score != 10000000 && score != -10000000 {
 		mp[dep][h.hashValue] = score
 		//fmt.Println("set", dep, h.hashValue, score)
 	}
