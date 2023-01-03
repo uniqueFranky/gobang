@@ -392,6 +392,11 @@ class Game extends React.Component {
         if(this.state.firstPlayer !== 0) { // who to be the first to play is decided
             console.log(JSON.stringify(this.state.status))
             let winner = this.checkWinner();
+            if(winner === 1) {
+                winner = 'AI'
+            } else if(winner === 2) {
+                winner = '您'
+            }
             if(winner !== 0) {
                 setTimeout(() => {
                     alert(winner + " wins!");
