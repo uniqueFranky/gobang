@@ -5,7 +5,7 @@ import (
 	"sort"
 )
 
-func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
+func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int, []evaluator.LevelTuple, []evaluator.LevelTuple) {
 	selectable := make([][]bool, 15)
 	for i := 0; i < 15; i++ {
 		selectable[i] = make([]bool, 15)
@@ -14,7 +14,7 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 	for i := 0; i < 15; i++ {
 		for j := 0; j < 15; j++ {
 			if c.status[i][j] != 0 {
-				for k := -2; k <= 2; k++ {
+				for k := -1; k <= 1; k++ {
 					if i+k < 15 && i+k >= 0 && c.status[i+k][j] == 0 {
 						selectable[i+k][j] = true
 					}
@@ -54,12 +54,18 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 	oppLvTuples, danger := c.getAllLevels(opp, pts)
 	selfLvTuples, _ := c.getAllLevels(turn, pts)
 	added := make(map[int]bool)
+	sort.Slice(oppLvTuples, func(i, j int) bool {
+		return oppLvTuples[i].Lv < oppLvTuples[j].Lv
+	})
+	sort.Slice(selfLvTuples, func(i, j int) bool {
+		return selfLvTuples[i].Lv < selfLvTuples[j].Lv
+	})
 	if c.shouldDefense(oppLvTuples, selfLvTuples, danger) { // Defense
 		//fmt.Println("Defense")
 		var newPts []evaluator.Point
 		for _, tp := range oppLvTuples {
 			if tp.Lv == 0 {
-				return nil, opp
+				return nil, opp, nil, nil
 			}
 			x := tp.X
 			y := tp.Y
@@ -75,7 +81,7 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 				}
 			}
 		}
-		return newPts, 0
+		return newPts, 0, selfLvTuples, oppLvTuples
 	} else { //Offense
 		//fmt.Println("Offense")
 		pts = make([]evaluator.Point, 0)
@@ -94,17 +100,11 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int) {
 				}
 			}
 		}
-		return pts, 0
+		return pts, 0, selfLvTuples, oppLvTuples
 	}
 }
 
 func (c *Calculator) shouldDefense(oppLvTuples []evaluator.LevelTuple, selfLvTuples []evaluator.LevelTuple, danger evaluator.Danger) bool {
-	sort.Slice(oppLvTuples, func(i, j int) bool {
-		return oppLvTuples[i].Lv < oppLvTuples[j].Lv
-	})
-	sort.Slice(selfLvTuples, func(i, j int) bool {
-		return selfLvTuples[i].Lv < selfLvTuples[j].Lv
-	})
 	if len(selfLvTuples) > 0 {
 		if selfLvTuples[0].Lv <= 2 /* 2 == single4 */ {
 			return false

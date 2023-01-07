@@ -26,10 +26,10 @@ func main() {
 	zobrist.InitHasher()
 	zobrist.ZobristInit()
 	server.HandleFunc("/getStep/{zobrist}/{stepCnt}", getStep()).Methods("POST")
-	if err := http.ListenAndServeTLS(":9999", "/etc/httpd/ssl/franky.pro.crt", "/etc/httpd/ssl/franky.pro.key", server); err != nil {
-		fmt.Println("ERROR!!!!!!!!")
-	}
-	//http.ListenAndServe(":9999", server)
+	//if err := http.ListenAndServeTLS(":9999", "/etc/httpd/ssl/franky.pro.crt", "/etc/httpd/ssl/franky.pro.key", server); err != nil {
+	//	fmt.Println("ERROR!!!!!!!!")
+	//}
+	http.ListenAndServe(":9999", server)
 
 }
 
@@ -56,21 +56,10 @@ func getStep() http.HandlerFunc {
 		}
 		hasher := zobrist.NewHasher(hashValue)
 		calc := calculator.NewCalculator(status)
-		var score1, score2 int64
-		var step1, step2 int64
+		var score1 int64
 		var step int64
 
-		if stepCnt <= 8 { // no need to search so deep
-			step = calc.AlphaBeta(1, 3, -10000000, 10000000, hasher, &score1, int(stepCnt))
-		} else { // Iterative Deepening
-			step1 = calc.AlphaBeta(1, 3, -10000000, 10000000, hasher, &score1, int(stepCnt))
-			step2 = calc.AlphaBeta(1, 5, -10000000, 10000000, hasher, &score2, int(stepCnt))
-			if score1 >= score2 {
-				step = step1
-			} else {
-				step = step2
-			}
-		}
+		step = calc.AlphaBeta(1, 5, -10000000, 10000000, hasher, &score1, int(stepCnt))
 
 		y := step % 15
 		x := (step - y) / 15

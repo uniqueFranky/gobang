@@ -1,7 +1,6 @@
 package calculator
 
 import (
-	"gobang-backend/evaluator"
 	"gobang-backend/zobrist"
 )
 
@@ -14,7 +13,7 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 		turn = 1
 	}
 
-	pts, winner := c.getSelectable(turn)
+	pts, winner, selfLvTps, oppLvTps := c.getSelectable(turn)
 	if winner == 1 {
 		return win + 10000
 	} else if winner == 2 {
@@ -24,10 +23,6 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 	if curDep == maxDep {
 		return c.calcScore()
 	}
-
-	//if curDep == 1 {
-	//	fmt.Println(pts)
-	//}
 
 	oldVal, ok := hasher.GetScore(maxDep - curDep)
 	if ok && curDep != 1 {
@@ -43,6 +38,14 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 			i := pts[id].X
 			j := pts[id].Y
 			c.status[i][j] = 2
+			if len(selfLvTps) > 0 && len(oppLvTps) > 0 {
+				elic := c.calcElicitation(2, (maxDep-curDep)/2, selfLvTps, (maxDep-curDep)/2, oppLvTps)
+				if elic >= alpha { // Elicitation
+					c.status[i][j] = 0
+					continue
+				}
+			}
+
 			hasher.PutAt(i, j, 0, 2)
 			val := c.AlphaBeta(curDep+1, maxDep, -win*10, alpha, hasher, totScore, stepCnt+1)
 			if val < alpha {
@@ -61,11 +64,16 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 			i := pts[id].X
 			j := pts[id].Y
 			c.status[i][j] = 1
+			if len(selfLvTps) > 0 && len(oppLvTps) > 0 {
+				elic := c.calcElicitation(2, (maxDep-curDep)/2-1, selfLvTps, (maxDep-curDep)/2, oppLvTps)
+				if elic <= alpha { // Elicitation
+					c.status[i][j] = 0
+					continue
+				}
+			}
 			hasher.PutAt(i, j, 0, 1)
 			val := c.AlphaBeta(curDep+1, maxDep, win*10, alpha, hasher, totScore, stepCnt+1)
-			//if curDep == 1 {
-			//	fmt.Println(i, j, val, alpha)
-			//}
+
 			if val > alpha {
 				alpha = val
 				maxposi = i
@@ -86,19 +94,4 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 	} else {
 		return alpha
 	}
-}
-
-func (c *Calculator) calc(turn int) int64 {
-	var score int64 = 0
-	eva := evaluator.NewEvaluator(c.status)
-	lvTuple := eva.GetLevelsForCalculator(turn)
-	for _, tp := range lvTuple {
-		lv := tp.Lv
-		score += constantScores[lv]
-	}
-	return score
-}
-
-func (c *Calculator) calcScore() int64 {
-	return c.calc(1) - c.calc(2)
 }

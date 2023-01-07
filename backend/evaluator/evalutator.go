@@ -97,7 +97,3 @@ func (e *Evaluator) GetLevelsForCalculator(turn int) []LevelTuple {
 func (e *Evaluator) Print() {
 	fmt.Println(e.status)
 }
-
-func (e *Evaluator) GetWinner() {
-
-}
