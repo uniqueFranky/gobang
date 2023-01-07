@@ -28,7 +28,8 @@ func (c *Calculator) calcScore() int64 {
 	return c.calc(1) - c.calc(2)
 }
 
-func (c *Calculator) calcElicitation(turn int, selfStep int, selfLvTps []evaluator.LevelTuple, oppStep int, oppLvTps []evaluator.LevelTuple) int64 {
+func (c *Calculator) calcElicitation(turn int, selfStep int, selfLvTps []evaluator.LevelTuple, oppStep int,
+	oppLvTps []evaluator.LevelTuple) int64 {
 	selfSlice := make([]evaluator.LevelTuple, 0)
 	for _, t := range selfLvTps {
 		selfSlice = append(selfSlice, t)

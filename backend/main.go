@@ -59,16 +59,16 @@ func getStep() http.HandlerFunc {
 		var score1 int64
 		var step int64
 
-		step = calc.AlphaBeta(1, 5, -10000000, 10000000, hasher, &score1, int(stepCnt))
+		step = calc.AlphaBeta(1, 7, -10000000, 10000000, hasher, &score1, int(stepCnt))
 
 		y := step % 15
 		x := (step - y) / 15
-		s := Step{
+		s := Step{ // convert 1D coordinate  to 2D coordinate
 			X: int(x),
 			Y: int(y),
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(s); err != nil {
+		if err := json.NewEncoder(w).Encode(s); err != nil { // return coordinate to front end
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

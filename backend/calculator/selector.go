@@ -50,18 +50,23 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int, []evaluato
 	} else {
 		opp = 1
 	}
-	//fmt.Println(pts)
+
+	// 获取赢线三元组
 	oppLvTuples, danger := c.getAllLevels(opp, pts)
 	selfLvTuples, _ := c.getAllLevels(turn, pts)
+
 	added := make(map[int]bool)
+
+	// 对赢线进行排序
 	sort.Slice(oppLvTuples, func(i, j int) bool {
 		return oppLvTuples[i].Lv < oppLvTuples[j].Lv
 	})
 	sort.Slice(selfLvTuples, func(i, j int) bool {
 		return selfLvTuples[i].Lv < selfLvTuples[j].Lv
 	})
+
+	// 判断攻守
 	if c.shouldDefense(oppLvTuples, selfLvTuples, danger) { // Defense
-		//fmt.Println("Defense")
 		var newPts []evaluator.Point
 		for _, tp := range oppLvTuples {
 			if tp.Lv == 0 {
@@ -110,7 +115,8 @@ func (c *Calculator) shouldDefense(oppLvTuples []evaluator.LevelTuple, selfLvTup
 			return false
 		}
 		if len(oppLvTuples) > 0 {
-			if selfLvTuples[0].Lv <= oppLvTuples[0].Lv || (selfLvTuples[0].Lv <= 4 /* 4 == single3 */ && oppLvTuples[0].Lv > 2 /* 2 == single4 */) {
+			if selfLvTuples[0].Lv <= oppLvTuples[0].Lv ||
+				(selfLvTuples[0].Lv <= 4 /* 4 == single3 */ && oppLvTuples[0].Lv > 2 /* 2 == single4 */) {
 				return false
 			}
 		}
