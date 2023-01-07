@@ -1,6 +1,6 @@
 export function aiSolve(status, callback, zobrist, stepCnt) {
     let xhr = new XMLHttpRequest();
-    let url = new URL("http://localhost:9999/getStep/" + zobrist + "/" + stepCnt)
+    let url = new URL("https://franky.pro:9999/getStep/" + zobrist + "/" + stepCnt)
     xhr.open("POST", url, true);
     const start = performance.now();
     xhr.onload = function (e) {
@@ -17,7 +17,7 @@ export function aiSolve(status, callback, zobrist, stepCnt) {
         }
     }
     xhr.onerror = function (e) {
-        console.error(xhr.statusText);
+        alert('服务器通信错误！请刷新重试！');
     };
     xhr.send(JSON.stringify(status));
 }

@@ -384,7 +384,21 @@ class Game extends React.Component {
             }
         }
 
-
+        let tie = true
+        for(let i = 0; i < 15; i++) {
+            for(let j = 0; j < 15; j++) {
+                if(this.state.status[i][j] === 0) {
+                    tie = false;
+                    break;
+                }
+                if(!tie) {
+                    break;
+                }
+            }
+        }
+        if(tie) {
+            return -1;
+        }
         return 0;
     }
 
@@ -396,6 +410,8 @@ class Game extends React.Component {
                 winner = 'AI'
             } else if(winner === 2) {
                 winner = '您'
+            } else if(winner === -1) {
+                winner = 'no one'
             }
             if(winner !== 0) {
                 setTimeout(() => {
