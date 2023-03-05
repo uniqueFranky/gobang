@@ -64,7 +64,6 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int, []evaluato
 	sort.Slice(selfLvTuples, func(i, j int) bool {
 		return selfLvTuples[i].Lv < selfLvTuples[j].Lv
 	})
-
 	// 判断攻守
 	if c.shouldDefense(oppLvTuples, selfLvTuples, danger) { // Defense
 		var newPts []evaluator.Point
@@ -88,7 +87,6 @@ func (c *Calculator) getSelectable(turn int) ([]evaluator.Point, int, []evaluato
 		}
 		return newPts, 0, selfLvTuples, oppLvTuples
 	} else { //Offense
-		//fmt.Println("Offense")
 		pts = make([]evaluator.Point, 0)
 		for _, tp := range selfLvTuples {
 			x := tp.X

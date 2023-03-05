@@ -156,7 +156,7 @@ func Init() {
 	level[0][1][1][0][2][2] = half2
 	level[0][1][1][1][0][0] = double3
 	level[0][1][1][1][0][1] = single4
-	level[0][1][1][1][0][2] = half3
+	level[0][1][1][1][0][2] = double3
 	level[0][1][1][1][1][0] = double4
 	level[0][1][1][1][1][1] = win
 	level[0][1][1][1][1][2] = single4

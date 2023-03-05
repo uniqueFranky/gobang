@@ -37,10 +37,10 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 	}
 
 	// 记忆化：若已经搜索过这一节点，直接返回即可
-	oldVal, ok := hasher.GetScore(maxDep - curDep)
-	if ok && curDep != 1 {
-		return oldVal
-	}
+	//oldVal, ok := hasher.GetScore(maxDep - curDep)
+	//if ok && curDep != 1 {
+	//	return oldVal
+	//}
 
 	moveLen := len(pts)
 	var maxposi int
@@ -67,12 +67,12 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 			hasher.PutAt(i, j, 2, 0)
 			c.status[i][j] = 0
 			if alpha <= beta { // 剪枝
-				hasher.SetScore(maxDep-curDep, alpha)
+				//hasher.SetScore(maxDep-curDep, alpha)
 				return alpha
 			}
 		}
 		return alpha
-	} else {                              // Computer's turn, max node
+	} else { // Computer's turn, max node
 		for id := 0; id < moveLen; id++ { // 在id这一坐标模拟落子，计算新的局面并向更深层搜索
 			i := pts[id].X
 			j := pts[id].Y
@@ -95,12 +95,12 @@ func (c *Calculator) AlphaBeta(curDep int, maxDep int, alpha int64, beta int64, 
 			hasher.PutAt(i, j, 1, 0)
 			c.status[i][j] = 0
 			if alpha >= beta { // 剪枝
-				hasher.SetScore(maxDep-curDep, alpha)
+				//hasher.SetScore(maxDep-curDep, alpha)
 				return alpha
 			}
 		}
 	}
-	hasher.SetScore(maxDep-curDep, alpha) // 记忆化
+	//hasher.SetScore(maxDep-curDep, alpha) // 记忆化
 	// 返回结果
 	if curDep == 1 {
 		*totScore = alpha
